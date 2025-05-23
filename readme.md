@@ -84,10 +84,6 @@ ASSAA/
 
 ### Frontend
 - **React.js** - Librería para construir interfaces de usuario.
-- **Vite** - Empaquetador rápido para proyectos React.
-- **Axios** - Cliente HTTP para consumir APIs REST.
-- **TailwindCSS** - Framework de CSS basado en utilidades.
-
 ---
 
 ### Backend
@@ -97,7 +93,7 @@ npm install express mysql2 dotenv bcryptjs cors
 
 ### Frontend
 ```bash
-npm install react react-dom axios tailwindcss
+npm install react
 ```
 
 ---
@@ -113,7 +109,7 @@ npm install react react-dom axios tailwindcss
     ```
 3. Ejecutar el servidor:
     ```bash
-    node app.js
+    node app
     ```
 
 > Asegúrate que el servidor de base de datos (MySQL) esté activo y la base de datos `assa_mas` esté creada.
@@ -129,9 +125,9 @@ npm install react react-dom axios tailwindcss
     ```
 3. Ejecutar el proyecto:
     ```bash
-    npm run dev
+    npm start
     ```
 
-> El frontend suele correr en `http://localhost:5173/` y el backend en `http://localhost:3000/`.
+> El frontend esta corriendo en `http://localhost:3000/` y el backend en `http://localhost:3001/`.
 
 ---

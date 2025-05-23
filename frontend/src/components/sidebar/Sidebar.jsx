@@ -47,10 +47,10 @@ const Sidebar = () => {
           Icon={NomIcon}
           text="Nómina, Incapacidades, Certificaciones"
         />
-        <MenuLink2 Icon={InstaIcon} text="Assa Abloy Colombia" />
+        <MenuLink2 Icon={InstaIcon} text="Assa Abloy Colombia" href={"https://www.instagram.com/assaabloycol/"}/>
         <MenuLink2 Icon={WhatsAppIcon} text="Comunidad Colombia" />
         <MenuLink2 Icon={CompensarIcon} text="Club de Bienestar Compensar" />
-        <MenuLink2 Icon={LinkedInIcon} text="Assa Abloy Colombia" />
+        <MenuLink2 Icon={LinkedInIcon} text="Assa Abloy Colombia"href={"https://co.linkedin.com/company/assa-abloy-colombia"}/>
         <hr className="sidebarHr" />
         <span className="navbarLink">Espacios</span>
         <MenuLink Icon={<SentimentSatisfiedIcon />} text="Gestion Humana" />
