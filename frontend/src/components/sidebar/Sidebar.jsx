@@ -46,10 +46,11 @@ const Sidebar = () => {
         <MenuLink2
           Icon={NomIcon}
           text="Nómina, Incapacidades, Certificaciones"
+          href={"https://nominasaas15.heinsohn.com.co/NominaWEB/common/mainPages/login.seam?cid=296"}
         />
         <MenuLink2 Icon={InstaIcon} text="Assa Abloy Colombia" href={"https://www.instagram.com/assaabloycol/"}/>
-        <MenuLink2 Icon={WhatsAppIcon} text="Comunidad Colombia" />
-        <MenuLink2 Icon={CompensarIcon} text="Club de Bienestar Compensar" />
+        <MenuLink2 Icon={WhatsAppIcon} text="Comunidad Colombia" href={"https://chat.whatsapp.com/KawjwncFit7GKtscGjHheJ"}/>
+        <MenuLink2 Icon={CompensarIcon} text="Club de Bienestar Compensar"href={"https://www.tiendacompensar.com/?_gl=1*g9wy9q*_ga*NDE4ODg1NDkzLjE2ODY3MDczNDU.*_ga_X8W0BCVF42*MTcxNjU3ODE0Ni4yMy4xLjE3MTY1Nzg3NjEuNTkuMC4w*_ga_PEPKZ9HLDT*MTcxNjU3ODE0Ni4yMy4xLjE3MTY1Nzg3NjAuNjAuMC4w"}/>
         <MenuLink2 Icon={LinkedInIcon} text="Assa Abloy Colombia"href={"https://co.linkedin.com/company/assa-abloy-colombia"}/>
         <hr className="sidebarHr" />
         <span className="navbarLink">Espacios</span>
