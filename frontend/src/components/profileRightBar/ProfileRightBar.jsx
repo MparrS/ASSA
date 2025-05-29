@@ -1,3 +1,4 @@
+//Copia
 import { doc, onSnapshot } from "firebase/firestore";
 import React, { useContext, useState } from "react";
 import { useEffect } from "react";

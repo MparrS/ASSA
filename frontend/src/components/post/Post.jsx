@@ -12,7 +12,7 @@ import {
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Users } from "../../data";
+import { Users } from "../../data"; // Si ya no se usa, podrías quitarlo
 
 const Post = ({ post }) => {
   const [current, setCurrent] = useState(0);
@@ -24,12 +24,6 @@ const Post = ({ post }) => {
 
   const prev = () => setCurrent((c) => (c === 0 ? total - 1 : c - 1));
   const next = () => setCurrent((c) => (c === total - 1 ? 0 : c + 1));
-
-  const handleCommentLike = (index) => {
-    const updated = [...commentLikes];
-    updated[index] += 1;
-    setCommentLikes(updated);
-  };
 
   const renderMedia = (media) => {
     const isVideo = /\.(mp4|webm|ogg)$/i.test(media);
@@ -46,17 +40,17 @@ const Post = ({ post }) => {
   return (
     <div className="post">
       <div className="postWrapper">
-        {/* --- Header --- */}
+        {/* Header */}
         <div className="postTop">
           <div className="postTopLeft">
-            <Link to={`/profile/${post.user.username}`}>
+            <Link to={`/profile/${post.usuario_id}`}>
               <img
-                src={post.user.profilePicture}
-                alt={post.user.username}
+                src={post.usuario_imagen}
+                alt={post.usuario_nombre}
                 className="postProfileImg"
               />
             </Link>
-            <span className="postUsername">@{post.user.username}</span>
+            <span className="postUsername">@{post.usuario_nombre}</span>
             <span className="postDate">{post.date}</span>
           </div>
           <div className="postTopRight">
@@ -66,7 +60,7 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* --- Body y Carrusel --- */}
+        {/* Body y Carrusel */}
         <div className="postCenter">
           <p className="postText">{post.body}</p>
 
@@ -76,9 +70,7 @@ const Post = ({ post }) => {
                 <ArrowBackIos fontSize="small" />
               </IconButton>
 
-              <div className="carouselSlide">
-                {renderMedia(post.content[current])}
-              </div>
+              <div className="carouselSlide">{renderMedia(post.content[current])}</div>
 
               <IconButton onClick={next} className="arrow right">
                 <ArrowForwardIos fontSize="small" />
@@ -97,7 +89,7 @@ const Post = ({ post }) => {
           )}
         </div>
 
-        {/* --- Footer botones --- */}
+        {/* Footer botones */}
         <div className="postBottom">
           <div className="postBottomLeft">
             <Favorite style={{ color: "red" }} />
@@ -131,7 +123,7 @@ const Post = ({ post }) => {
         {post.comments?.length > 0 && (
           <div className="commentsSection">
             {post.comments.map((comment, index) => {
-              const user = Users.find(u => u.id === comment.userId);
+              const user = Users.find((u) => u.id === comment.userId);
               return (
                 <div key={comment.id} className="comment">
                   <img
@@ -154,7 +146,6 @@ const Post = ({ post }) => {
             })}
           </div>
         )}
-
       </div>
     </div>
   );
