@@ -13,7 +13,7 @@ async function obtenerPublicaciones() {
       e.id AS espacio_id,
       e.nombre AS espacio_nombre
     FROM publicaciones p
-    JOIN usuarios u ON p.usuario_id = u.id
+    JOIN users u ON p.usuario_id = u.id
     JOIN espacios e ON p.espacio_id = e.id
     ORDER BY p.fecha_publicacion DESC
   `;

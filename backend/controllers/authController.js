@@ -15,7 +15,7 @@ const login = async (req, res) => {
     }
 
     // Buscar usuario por documento
-    const results = await query('SELECT * FROM usuarios WHERE documento = ?', [documento]);
+    const results = await query('SELECT * FROM users WHERE documento = ?', [documento]);
 
     if (results.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -30,8 +30,8 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    // Actualizar ultimo_login
-    await query('UPDATE usuarios SET ultimo_login = NOW() WHERE id = ?', [usuario.id]);
+    // Actualizar ultimologin
+    await query('UPDATE users SET ultimologin = NOW() WHERE id = ?', [usuario.id]);
 
     // Crear token JWT
     const token = jwt.sign(
@@ -48,7 +48,7 @@ const login = async (req, res) => {
         nombre: usuario.nombre,
         rol: usuario.rol,
         puntos: usuario.puntos,
-        ultimo_login: new Date().toISOString(),
+        ultimologin: new Date().toISOString(),
       }
     });
 
@@ -62,7 +62,7 @@ const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id; // asumiendo que authMiddleware setea req.user
 
-    const results = await query('SELECT id, nombre, documento, rol, puntos, ultimo_login FROM usuarios WHERE id = ?', [userId]);
+    const results = await query('SELECT id, nombre, documento, rol, puntos, ultimologin FROM users WHERE id = ?', [userId]);
 
     if (results.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado' });

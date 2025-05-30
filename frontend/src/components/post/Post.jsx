@@ -1,149 +1,186 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./post.scss";
-import {
-  ChatBubbleOutline,
-  MoreVert,
-  Favorite,
-  ThumbUp,
-  ThumbUpAltOutlined,
-  ShareOutlined,
-  ArrowBackIos,
-  ArrowForwardIos,
-} from "@mui/icons-material";
-import { IconButton } from "@mui/material";
-import { Link } from "react-router-dom";
-import { Users } from "../../data"; // Si ya no se usa, podrías quitarlo
+import { AuthContext } from "../../context/AuthContext"; // Asegúrate de tener este contexto configurado
 
 const Post = ({ post }) => {
-  const [current, setCurrent] = useState(0);
-  const total = post.content?.length || 0;
+  // Obtenemos el usuario autenticado desde el contexto.
+  const { currentUser } = useContext(AuthContext);
 
-  const [commentLikes, setCommentLikes] = useState(
-    post.comments?.map((c) => parseInt(c.like)) || []
-  );
+  // Datos del autor del post
+  const userName = post.userName || "Sin nombre";
+  const userUsername = post.userUsername || "usuarioDesconocido";
+  const userProfilePicture = post.userProfilePicture || "/ruta/default.jpg";
 
-  const prev = () => setCurrent((c) => (c === 0 ? total - 1 : c - 1));
-  const next = () => setCurrent((c) => (c === total - 1 ? 0 : c + 1));
+  // Contenido del post
+  const postTitle = post.title || "";
+  const postBody = post.body || "";
 
-  const renderMedia = (media) => {
-    const isVideo = /\.(mp4|webm|ogg)$/i.test(media);
-    return isVideo ? (
-      <video controls className="carouselMedia">
-        <source src={media} type="video/mp4" />
-        Tu navegador no soporta video.
-      </video>
-    ) : (
-      <img src={media} alt="" className="carouselMedia" />
-    );
+  // Imágenes (propiedad post_images)
+  const images = post.post_images || [];
+  const [currentImage, setCurrentImage] = useState(0);
+
+  const handlePrevImage = () => {
+    setCurrentImage(prev => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImage(prev => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  // Gestión de "like"
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.likes || 0);
+
+  const handleLike = async () => {
+    if (isLiked) {
+      try {
+        const response = await fetch(`http://localhost:3001/api/posts/${post.id}/unlike`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (response.ok) {
+          setIsLiked(false);
+          setLikeCount(prev => (prev > 0 ? prev - 1 : 0));
+        }
+      } catch (error) {
+        console.error("Error al quitar like:", error);
+      }
+    } else {
+      try {
+        const response = await fetch(`http://localhost:3001/api/posts/${post.id}/like`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (response.ok) {
+          setIsLiked(true);
+          setLikeCount(prev => prev + 1);
+        }
+      } catch (error) {
+        console.error("Error al dar like:", error);
+      }
+    }
+  };
+
+  // Gestión de comentarios: la sección está oculta por defecto
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [comments, setComments] = useState(post.comments || []);
+
+  const handleCommentSubmit = async () => {
+    if (!commentText.trim()) return;
+    const currentTime = new Date().toLocaleString(); // La fecha se muestra tal cual
+    const newComment = {
+      postId: post.id,
+      userId: currentUser.id, // Se usa el ID del usuario autenticado
+      body: commentText,
+      date: currentTime,
+      likes: 0
+    };
+
+    try {
+      const response = await fetch("http://localhost:3001/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newComment)
+      });
+      if (!response.ok) {
+        throw new Error("Error al enviar el comentario");
+      }
+      const data = await response.json();
+      const commentToAdd = {
+        id: data.commentId,
+        ...newComment,
+        // Se usan los datos reales del usuario autenticado
+        name: currentUser.name,
+        username: currentUser.username,
+        profilePicture: currentUser.profilePicture || "/ruta/default.jpg"
+      };
+      setComments(prev => [...prev, commentToAdd]);
+      setCommentText("");
+    } catch (error) {
+      console.error("Error al insertar comentario:", error);
+    }
   };
 
   return (
     <div className="post">
       <div className="postWrapper">
-        {/* Header */}
-        <div className="postTop">
-          <div className="postTopLeft">
-            <Link to={`/profile/${post.usuario_id}`}>
-              <img
-                src={post.usuario_imagen}
-                alt={post.usuario_nombre}
-                className="postProfileImg"
-              />
-            </Link>
-            <span className="postUsername">@{post.usuario_nombre}</span>
-            <span className="postDate">{post.date}</span>
-          </div>
-          <div className="postTopRight">
-            <IconButton size="small">
-              <MoreVert />
-            </IconButton>
+        {/* CABECERA */}
+        <div className="post-header">
+          <img className="profile-img" src={userProfilePicture} alt={userName} />
+          <div className="author-info">
+            <span className="name">{userName}</span>
+            <span className="date">{post.date}</span>
           </div>
         </div>
 
-        {/* Body y Carrusel */}
-        <div className="postCenter">
-          <p className="postText">{post.body}</p>
-
-          {total > 0 && (
-            <div className="carouselContainer">
-              <IconButton onClick={prev} className="arrow left">
-                <ArrowBackIos fontSize="small" />
-              </IconButton>
-
-              <div className="carouselSlide">{renderMedia(post.content[current])}</div>
-
-              <IconButton onClick={next} className="arrow right">
-                <ArrowForwardIos fontSize="small" />
-              </IconButton>
-
-              <div className="dots">
-                {post.content.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`dot ${i === current ? "active" : ""}`}
-                    onClick={() => setCurrent(i)}
-                  />
-                ))}
-              </div>
+        {/* CONTENIDO */}
+        <div className="post-content">
+          {postTitle && <h2 className="title">{postTitle}</h2>}
+          {postBody && <p className="body">{postBody}</p>}
+          {images.length > 0 && (
+            <div className="post-images">
+              {images.length > 1 && (
+                <>
+                  <button className="nav prev" onClick={handlePrevImage}>
+                    &lt;
+                  </button>
+                  <button className="nav next" onClick={handleNextImage}>
+                    &gt;
+                  </button>
+                </>
+              )}
+              <img className="carousel-img" src={images[currentImage]} alt={`Imagen ${currentImage + 1}`} />
             </div>
           )}
         </div>
 
-        {/* Footer botones */}
-        <div className="postBottom">
-          <div className="postBottomLeft">
-            <Favorite style={{ color: "red" }} />
-            <ThumbUp style={{ color: "#011631", marginLeft: 8 }} />
-            <span className="postLikeCounter">{post.like}</span>
+        {/* PIE / ACCIONES */}
+        <div className="post-footer">
+          <div className="actions">
+            <div className="action" onClick={handleLike}>
+              <span role="img" aria-label="like">👍</span> Me gusta
+            </div>
+            <div className="action" onClick={() => setShowComments(!showComments)}>
+              <span role="img" aria-label="comment">💬</span> Comentario
+            </div>
           </div>
-          <div className="postBottomRight">
-            <span className="postCommentText">
-              {post.comment} · comments · share
-            </span>
-          </div>
-        </div>
-
-        <hr className="footerHr" />
-
-        <div className="postBottomFooter">
-          <div className="postBottomFooterItem">
-            <ThumbUpAltOutlined className="footerIcon" />
-            <span className="footerText">Like</span>
-          </div>
-          <div className="postBottomFooterItem">
-            <ChatBubbleOutline className="footerIcon" />
-            <span className="footerText">Comment</span>
-          </div>
-          <div className="postBottomFooterItem">
-            <ShareOutlined className="footerIcon" />
-            <span className="footerText">Share</span>
+          <div className="details">
+            {likeCount} me gusta · {comments.length} comentarios
           </div>
         </div>
 
-        {post.comments?.length > 0 && (
-          <div className="commentsSection">
-            {post.comments.map((comment, index) => {
-              const user = Users.find((u) => u.id === comment.userId);
-              return (
-                <div key={comment.id} className="comment">
+        {/* SECCIÓN DE COMENTARIOS: Sólo se muestra al hacer clic en "Comentario" */}
+        {showComments && (
+          <div className="comments-section">
+            <div className="comment-input-row">
+              <input
+                className="comment-input"
+                type="text"
+                placeholder="Escribe un comentario..."
+                value={commentText}
+                onChange={e => setCommentText(e.target.value)}
+              />
+              <button className="comment-button" onClick={handleCommentSubmit}>
+                Publicar
+              </button>
+            </div>
+            <div className="comment-list">
+              {comments.map(comment => (
+                <div className="comment" key={comment.id}>
                   <img
-                    src={user?.profilePicture}
-                    alt={user?.username}
-                    className="commentProfileImg"
+                    className="comment-profile"
+                    src={comment.profilePicture || "/ruta/default.jpg"}
+                    alt={comment.name}
                   />
-                  <div className="commentContent">
-                    <span className="commentUsername">@{user?.username}</span>
-                    <span className="commentDate">{comment.date}</span>
-                    <p className="commentBody">{comment.body}</p>
-                    <div className="commentActions">
-                      <button className="likeCommentButton">
-                        👍 {comment.like}
-                      </button>
-                    </div>
+                  <div className="comment-data">
+                    <strong>{comment.name}</strong> (@{comment.username})
+                    <p className="comment-body">{comment.body}</p>
+                    <div className="comment-date">{comment.date}</div>
                   </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         )}
       </div>

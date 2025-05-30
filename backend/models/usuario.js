@@ -8,7 +8,7 @@ router.get('/usuario', (req, res) => {
   const userId = 2; // Aquí puedes modificar para obtener el ID del usuario autenticado
 
   // Consulta a la base de datos para obtener los datos del usuario por ID
-  db.query('SELECT * FROM usuarios WHERE id = ?', [userId], (err, result) => {
+  db.query('SELECT * FROM users WHERE id = ?', [userId], (err, result) => {
     if (err) {
       return res.status(500).json({ error: 'Error en la base de datos' });
     }
@@ -34,7 +34,7 @@ router.put('/usuario', (req, res) => {
 
   // Consulta SQL para actualizar los datos del usuario en la base de datos
   const query = `
-    UPDATE usuarios
+    UPDATE users
     SET nombre = ?, apellido = ?, correo = ?, celular_personal = ?, linkedin = ?
     WHERE id = ?
   `;

@@ -6,4 +6,3 @@ router.post('/login', login);
 // Ruta protegida para obtener el perfil del usuario
 router.get('/profile', authMiddleware, getUserProfile);
 module.exports = router;
-//

@@ -75,77 +75,7 @@ export const Usersonline = [
     username: "Gloria",
     email: "Sincere@april.biz",
     profilePicture: "/assets/person/friend1.jpg",
-  },
-  {
-    id: 2,
-    name: "Ervin Howell",
-    username: "Madison",
-    email: "Shanna@melissa.tv",
-    profilePicture: "/assets/person/friend2.jpg",
-  },
-  {
-    id: 3,
-    name: "Clementine Bauch",
-    username: "Abigail",
-    email: "Nathan@yesenia.net",
-    profilePicture: "/assets/person/friend3.jpg",
-  },
-  {
-    id: 4,
-    name: "Patricia Lebsack",
-    username: "Sophia",
-    email: "Julianne.OConner@kory.org",
-    profilePicture: "/assets/person/friend4.jpg",
-  },
-  {
-    id: 5,
-    name: "Chelsey Dietrich",
-    username: "Marilyn",
-    email: "Lucio_Hettinger@annie.ca",
-    profilePicture: "/assets/person/friend5.jpg",
-  },
-  {
-    id: 6,
-    name: "Mrs. Dennis Schulist",
-    username: "Doris",
-    email: "Karley_Dach@jasper.info",
-    profilePicture: "/assets/person/friend6.jpg",
-  },
-  {
-    id: 7,
-    name: "Kurtis Weissnat",
-    username: "Rachel",
-    email: "Telly.Hoeger@billy.biz",
-    profilePicture: "/assets/person/friend7.jpg",
-  },
-  {
-    id: 8,
-    name: "Nicholas Runolfsdottir V",
-    username: "Victoria",
-    email: "Sherwood@rosamond.me",
-    profilePicture: "/assets/person/friend8.jpg",
-  },
-  {
-    id: 9,
-    name: "Catherine",
-    username: "Maria",
-    email: "Chaim_McDermott@dana.io",
-    profilePicture: "/assets/person/friend9.jpg",
-  },
-  {
-    id: 10,
-    name: "Clementina DuBuque",
-    username: "Theresa",
-    email: "Rey.Padberg@karina.biz",
-    profilePicture: "/assets/person/friend10.jpg",
-  },
-  {
-    id: 11,
-    name: "Sharon Mattew",
-    username: "Charlotte",
-    email: "Rey.Padberg@karina.biz",
-    profilePicture: "/assets/person/friend11.jpg",
-  },
+  }
 ];
 
 export const Posts = [
