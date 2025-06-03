@@ -51,6 +51,14 @@
       margin-bottom: 8px;
       color: #333;
     }
+    
+    /* Separa la fecha "hace tales" del contenido */
+    .post-date {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 12px;  // Espacio extra debajo del tiempo relativo
+    }
+    
     .body {
       font-size: 16px;
       line-height: 1.6;
@@ -59,7 +67,7 @@
     .post-images {
       position: relative;
       margin-top: 16px;
-      height: 300px; /* Altura fija para el carrusel */
+      height: 400px; /* Altura aumentada para agrandar las imágenes */
       overflow: hidden;
       
       img.carousel-img {
@@ -80,6 +88,18 @@
       }
       .prev { left: 12px; }
       .next { right: 12px; }
+      
+      /* Contador de imágenes (Slides) */
+      .image-counter {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
     }
   }
 

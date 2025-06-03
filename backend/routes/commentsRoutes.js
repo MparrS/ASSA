@@ -3,17 +3,24 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-router.post('/', async (req, res) => {
+// Endpoint GET para traer comentarios con datos de usuario:
+router.get('/', async (req, res) => {
   try {
-    const { postId, userId, body, date, likes } = req.body;
+    const { postId } = req.query;
     const connection = await db;
-    const query = "INSERT INTO comments (postId, userId, body, date, likes) VALUES (?, ?, ?, ?, ?)";
-    const values = [postId, userId, body, date, likes];
-    const [result] = await connection.promise().execute(query, values);
-    res.status(201).json({ commentId: result.insertId });
+    // Asegúrate de que los nombres de las columnas coincidan con tu BD.
+    const query = `
+      SELECT c.*, u.username, u.profilePicture
+      FROM comments c 
+      LEFT JOIN users u ON c.userId = u.id 
+      WHERE c.postId = ?
+      ORDER BY c.date ASC
+    `;
+    const [rows] = await connection.promise().execute(query, [postId]);
+    res.status(200).json({ comments: rows });
   } catch (error) {
-    console.error("Error al insertar comentario:", error);
-    res.status(500).json({ error: "Error al insertar comentario" });
+    console.error("Error al obtener comentarios:", error);
+    res.status(500).json({ error: "Error al obtener comentarios" });
   }
 });
 

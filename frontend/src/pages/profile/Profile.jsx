@@ -17,7 +17,7 @@ const Profile = () => {
           <div className="profileRightTop">
           
               <img
-                src={currentUser.photoURL}
+                src={currentUser.profilePicture}
                 alt=""
                 className="profileUserImg"
               />

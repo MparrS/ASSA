@@ -1,38 +1,35 @@
-//Copia
-import { doc, onSnapshot } from "firebase/firestore";
-import React, { useContext, useState } from "react";
-import { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { db } from "../../firebase";
 import "./profileRightBar.scss";
 
 const ProfileRightBar = () => {
-  const [getUserInfo, setGetUserInfo] = useState({});
   const { currentUser } = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    const getInfo = () => {
-      const unSub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
-        setGetUserInfo(doc.data());
-      });
-      return () => {
-        unSub();
-      };
+    // Función para obtener la info del usuario desde el endpoint (MySQL)
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch(`/api/users/${currentUser.id}`);
+        const data = await res.json();
+        setUserInfo(data);
+      } catch (err) {
+        console.error("Error fetching user info:", err);
+      }
     };
-    currentUser.uid && getInfo();
-  }, [currentUser.uid]);
 
-  console.log(getUserInfo);
+    if (currentUser && currentUser.id) {
+      fetchUserInfo();
+    }
+  }, [currentUser]);
 
+  // Mientras no se cargue la info, usamos los datos del currentUser
   return (
     <div className="profileRightBar">
       <div className="profileRightBarHeading">
-        <span className="profileRightBarTitle"> User Information</span>
-        <Link
-          to={`/profile/${currentUser.displayName}/edit`}
-          style={{ textDecoration: "none" }}
-        >
+        <span className="profileRightBarTitle">User Information</span>
+        <Link to={`/profile/${currentUser.id}/edit`} style={{ textDecoration: "none" }}>
           <span className="editButton">Edit Profile</span>
         </Link>
       </div>
@@ -41,25 +38,25 @@ const ProfileRightBar = () => {
         <div className="profileRightBarInfoItem">
           <span className="profileRightBarInfoKey">Email: </span>
           <span className="profileRightBarInfoValue">
-            {getUserInfo.email ? getUserInfo.email : currentUser.email}
+            { userInfo?.email || currentUser.email }
           </span>
         </div>
         <div className="profileRightBarInfoItem">
           <span className="profileRightBarInfoKey">Phone Number: </span>
           <span className="profileRightBarInfoValue">
-            {getUserInfo.phone ? getUserInfo.phone : currentUser.phone}
+            { userInfo?.phone || currentUser.phone }
           </span>
         </div>
         <div className="profileRightBarInfoItem">
           <span className="profileRightBarInfoKey">Language: </span>
           <span className="profileRightBarInfoValue">
-            {getUserInfo.language ? getUserInfo.language : currentUser.language}
+            { userInfo?.language || currentUser.language }
           </span>
         </div>
         <div className="profileRightBarInfoItem">
           <span className="profileRightBarInfoKey">Country: </span>
           <span className="profileRightBarInfoValue">
-              {getUserInfo.country ? getUserInfo.country : currentUser.country}
+            { userInfo?.country || currentUser.country }
           </span>
         </div>
       </div>
