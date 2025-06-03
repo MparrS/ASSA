@@ -1,13 +1,9 @@
 import React from "react";
 import Post from "../post/Post";
 import Share from "../share/Share";
-import { Posts } from "../../data"; 
-import { MergedPosts } from "../../data";
 import "./rewards.scss";
 
 const Rewards = () => {
-    const posts = Posts; 
-
     return (
         <div className="rewardsSection">
             <div className="rewardsHeader">

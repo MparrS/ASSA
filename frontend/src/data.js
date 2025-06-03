@@ -39,36 +39,6 @@ export const Usersonline = [
   }
 ];
 
-export const Posts = [
-  {
-    userId: 3,
-    id: 1,
-    title: "Nuevos Ingresos",
-     body: "💫Bienvenido(s) a nuestra comunidad ASSA ABLOY COLOMBIA. Aprovechamos este espacio para darle la bienvenida a todos los nuevos miembros que se unen a nuestra familia empresarial. Esperamos que disfruten de una experiencia enriquecedora y productiva aquí. 🌐¡Esperamos que se sientan bienvenidos y que tengan una gran experiencia en nuestra empresa! 🌐",
-    date: "5 mins ago",
-    like: 3,
-    comment: 2,
-    comments: [
-      {
-        id: 1,
-        userId: 1,
-        body: "¡Bienvenidos!",
-        date: "2 mins ago",
-        like: 1
-      },
-      {
-        id: 2,
-        userId: 2,
-        body: "¡Qué buena noticia!",
-        date: "1 min ago",
-        like: 0
-      }
-    ]
-  }
-];
-
-
-
 export const Espacios = [
   {
     userId: 3,
@@ -81,12 +51,4 @@ export const Espacios = [
     comment: "2",
   }
 ];
-
-export const MergedPosts = Posts.map(post => {
-  const user = Users.find(u => u.id === post.userId);
-  return {
-    ...post,
-    user,
-  };
-});
 
