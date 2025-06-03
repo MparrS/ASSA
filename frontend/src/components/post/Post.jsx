@@ -1,21 +1,16 @@
 import React, { useState, useContext } from "react";
 import "./post.scss";
-import { AuthContext } from "../../context/AuthContext"; // Asegúrate de tener este contexto configurado
+import { AuthContext } from "../../context/AuthContext";
 
 const Post = ({ post }) => {
-  // Obtenemos el usuario autenticado desde el contexto.
   const { currentUser } = useContext(AuthContext);
 
-  // Datos del autor del post
   const userName = post.userName || "Sin nombre";
   const userUsername = post.userUsername || "usuarioDesconocido";
   const userProfilePicture = post.userProfilePicture || "/ruta/default.jpg";
 
-  // Contenido del post
   const postTitle = post.title || "";
   const postBody = post.body || "";
-
-  // Imágenes (propiedad post_images)
   const images = post.post_images || [];
   const [currentImage, setCurrentImage] = useState(0);
 
@@ -27,51 +22,37 @@ const Post = ({ post }) => {
     setCurrentImage(prev => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
-  // Gestión de "like"
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
 
   const handleLike = async () => {
-    if (isLiked) {
-      try {
-        const response = await fetch(`http://localhost:3001/api/posts/${post.id}/unlike`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" }
-        });
-        if (response.ok) {
-          setIsLiked(false);
-          setLikeCount(prev => (prev > 0 ? prev - 1 : 0));
-        }
-      } catch (error) {
-        console.error("Error al quitar like:", error);
+    const url = `http://localhost:3001/api/posts/${post.id}/${isLiked ? "unlike" : "like"}`;
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (response.ok) {
+        setIsLiked(!isLiked);
+        setLikeCount(prev => isLiked ? Math.max(prev - 1, 0) : prev + 1);
       }
-    } else {
-      try {
-        const response = await fetch(`http://localhost:3001/api/posts/${post.id}/like`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" }
-        });
-        if (response.ok) {
-          setIsLiked(true);
-          setLikeCount(prev => prev + 1);
-        }
-      } catch (error) {
-        console.error("Error al dar like:", error);
-      }
+    } catch (error) {
+      console.error("Error al cambiar el estado del like:", error);
     }
   };
 
-  // Gestión de comentarios: la sección está oculta por defecto
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState(post.comments || []);
 
   const handleCommentSubmit = async () => {
     if (!commentText.trim()) return;
-    const currentTime = new Date().toLocaleString(); // La fecha se muestra tal cual
+
+    const currentTime = new Date().toLocaleString();
+
     const newComment = {
       postId: post.id,
-      userId: currentUser.id, // Se usa el ID del usuario autenticado
+      userId: currentUser.id,
       body: commentText,
       date: currentTime,
       likes: 0
@@ -83,18 +64,19 @@ const Post = ({ post }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newComment)
       });
-      if (!response.ok) {
-        throw new Error("Error al enviar el comentario");
-      }
+
+      if (!response.ok) throw new Error("Error al enviar el comentario");
+
       const data = await response.json();
+
       const commentToAdd = {
-        id: data.commentId,
+        id: data.commentId || Date.now(),
         ...newComment,
-        // Se usan los datos reales del usuario autenticado
         name: currentUser.name,
         username: currentUser.username,
         profilePicture: currentUser.profilePicture || "/ruta/default.jpg"
       };
+
       setComments(prev => [...prev, commentToAdd]);
       setCommentText("");
     } catch (error) {
@@ -105,7 +87,6 @@ const Post = ({ post }) => {
   return (
     <div className="post">
       <div className="postWrapper">
-        {/* CABECERA */}
         <div className="post-header">
           <img className="profile-img" src={userProfilePicture} alt={userName} />
           <div className="author-info">
@@ -114,7 +95,6 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* CONTENIDO */}
         <div className="post-content">
           {postTitle && <h2 className="title">{postTitle}</h2>}
           {postBody && <p className="body">{postBody}</p>}
@@ -122,12 +102,8 @@ const Post = ({ post }) => {
             <div className="post-images">
               {images.length > 1 && (
                 <>
-                  <button className="nav prev" onClick={handlePrevImage}>
-                    &lt;
-                  </button>
-                  <button className="nav next" onClick={handleNextImage}>
-                    &gt;
-                  </button>
+                  <button className="nav prev" onClick={handlePrevImage}>&lt;</button>
+                  <button className="nav next" onClick={handleNextImage}>&gt;</button>
                 </>
               )}
               <img className="carousel-img" src={images[currentImage]} alt={`Imagen ${currentImage + 1}`} />
@@ -135,7 +111,6 @@ const Post = ({ post }) => {
           )}
         </div>
 
-        {/* PIE / ACCIONES */}
         <div className="post-footer">
           <div className="actions">
             <div className="action" onClick={handleLike}>
@@ -150,7 +125,6 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* SECCIÓN DE COMENTARIOS: Sólo se muestra al hacer clic en "Comentario" */}
         {showComments && (
           <div className="comments-section">
             <div className="comment-input-row">

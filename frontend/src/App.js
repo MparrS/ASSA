@@ -17,7 +17,11 @@ import { AuthContext } from "./context/AuthContext";
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <div>Cargando...</div>; // Puedes poner un spinner aquí si prefieres
+  }
 
   const AuthRoute = ({ children }) => {
     if (!currentUser) {
@@ -60,6 +64,7 @@ function App() {
       ),
     },
   ]);
+
   return (
     <div className={darkMode ? "app dark" : "app"}>
       <RouterProvider router={router} />
@@ -68,4 +73,3 @@ function App() {
 }
 
 export default App;
-

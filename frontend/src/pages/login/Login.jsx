@@ -11,15 +11,14 @@ const Login = () => {
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setCurrentUser } = useContext(AuthContext);
+  const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
 
-  
+  // Redirigir solo si ya hay usuario cargado y autenticado
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (!loading && currentUser) {
       navigate('/');
     }
-  }, [navigate]);
+  }, [loading, currentUser, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -73,7 +72,7 @@ const Login = () => {
                 />
 
                 <input
-                  
+                  type="password"
                   placeholder="Contraseña"
                   id="password"
                   className="loginInput"
