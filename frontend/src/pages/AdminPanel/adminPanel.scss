@@ -1,0 +1,87 @@
+.admin-container {
+  display: flex;
+  height: 100vh;
+  font-family: sans-serif;
+  background-color: #f5f6f8;
+
+  .admin-sidebar {
+    width: 250px;
+    background-color: #e2e2e2;
+    padding: 20px;
+
+    .admin-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .admin-menu {
+      a,
+      summary {
+        display: block;
+        margin: 10px 0;
+        cursor: pointer;
+        color: #333;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      summary {
+        list-style: none;
+
+        &::-webkit-details-marker {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .admin-main {
+    flex-grow: 1;
+    padding: 30px;
+
+    .admin-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 20px;
+
+      button {
+        background-color: #555;
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #444;
+        }
+      }
+    }
+
+    .admin-card {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-button-blue {
+      background-color: #347af0;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #255edb;
+      }
+    }
+  }
+}

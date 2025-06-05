@@ -1,70 +1,107 @@
-import React, { useContext, useState } from "react";
-import {
-  Close,
-  EmojiEmotions,
-  PermMedia,
-  VideoCameraFront,
+import React, { useContext, useState, useRef } from "react";
+import { 
+  Close, 
+  EmojiEmotions, 
+  PermMedia, 
+  VideoCameraFront, 
+  ArrowBackIos, 
+  ArrowForwardIos 
 } from "@mui/icons-material";
 import "./share.scss";
 import { AuthContext } from "../../context/AuthContext";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import sendIcon from "../../assets/icon/send.png"; // Importa el icono de enviar
 
 const Share = () => {
   const [input, setInput] = useState("");
-  const [img, setImg] = useState(null);
+  const [files, setFiles] = useState([]); // Para almacenar múltiples archivos adjuntos
   const [showEmojis, setShowEmojis] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const carouselRef = useRef(null);
 
-  const handlePost = () => {
-    if (!currentUser) return;
+  if (!currentUser) {
+    console.error("No hay usuario actual definido");
+    return null;
+  }
 
-    const newPost = {
-      id: Date.now(),
-      uid: currentUser.id,
-      photoURL: currentUser.profilePicture || "/assets/person/default.jpg",
-      displayName: currentUser.name || "Usuario",
-      content: input,
-      image: img ? URL.createObjectURL(img) : null,
-      createdAt: new Date().toISOString(),
-    };
+  const handlePost = async () => {
+    const formData = new FormData();
+    formData.append("uid", currentUser.id);
+    formData.append("displayName", currentUser.name || "Usuario");
+    formData.append("content", input);
+    files.forEach(file => {
+      formData.append("image", file);
+    });
 
-    console.log("New Post:", newPost); // Simulate saving the post
-    // You can save it to localStorage or state if needed.
-
+    try {
+      const res = await fetch("http://localhost:3001/api/posts", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        throw new Error("Error al publicar el post");
+      }
+      const posted = await res.json();
+      console.log("Post publicado:", posted);
+      // Recargar la página después de publicar
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al publicar post:", error);
+    }
+    // Limpia los datos locales en caso de error o post exitoso
     setInput("");
-    setImg(null);
+    setFiles([]);
     setShowEmojis(false);
   };
 
   const handleKey = (e) => {
-    if (e.code === "Enter") handlePost();
+    if (e.code === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handlePost();
+    }
   };
 
   const addEmoji = (e) => {
-    let sym = e.unified.split("-");
-    let codesArray = sym.map((el) => "0x" + el);
-    let emoji = String.fromCodePoint(...codesArray);
-    setInput((prev) => prev + emoji);
+    const codes = e.unified.split("-").map(el => "0x" + el);
+    const emoji = String.fromCodePoint(...codes);
+    setInput(prev => prev + emoji);
   };
 
-  const removeImage = () => setImg(null);
+  const removeImage = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
-  if (!currentUser) return null;
+  const scrollLeft = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -200, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 200, behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="share">
       <div className="shareWrapper">
         <div className="shareTop">
+          {/* Muestra la imagen de perfil del usuario actual */}
           <img
-            src={currentUser.profilePicture || "/assets/person/default.jpg"}
+            src={
+              currentUser.profilePicture
+                ? `/assets/people/${currentUser.profilePicture}`
+                : "/assets/profileCover/DefaultProfile.jpg"
+            }
             alt="profile"
             className="shareProfileImg"
           />
           <textarea
             rows={2}
             style={{ resize: "none", overflow: "hidden" }}
-            placeholder={`What's on your mind ${currentUser.name || ""}?`}
+            placeholder={`Que tienes en mente ${currentUser.name || ""}?`}
             value={input}
             className="shareInput"
             onChange={(e) => setInput(e.target.value)}
@@ -72,10 +109,22 @@ const Share = () => {
           />
         </div>
         <hr className="shareHr" />
-        {img && (
-          <div className="shareImgContainer">
-            <img src={URL.createObjectURL(img)} alt="" className="shareImg" />
-            <Close className="shareCancelImg" onClick={removeImage} />
+        {files.length > 0 && (
+          <div className="shareImgCarouselWrapper">
+            <ArrowBackIos className="carouselArrow leftArrow" onClick={scrollLeft} />
+            <div className="shareImgCarousel" ref={carouselRef}>
+              {files.map((file, index) => (
+                <div key={index} className="shareImgPreview">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="preview"
+                    className="shareImg"
+                  />
+                  <Close className="shareCancelImg" onClick={() => removeImage(index)} />
+                </div>
+              ))}
+            </div>
+            <ArrowForwardIos className="carouselArrow rightArrow" onClick={scrollRight} />
           </div>
         )}
         <div className="shareBottom">
@@ -91,8 +140,9 @@ const Share = () => {
                 type="file"
                 id="file"
                 accept=".png,.jpeg,.jpg"
+                multiple
                 style={{ display: "none" }}
-                onChange={(e) => setImg(e.target.files[0])}
+                onChange={(e) => setFiles(Array.from(e.target.files))}
               />
             </label>
             <div onClick={() => setShowEmojis(!showEmojis)} className="shareOption">
@@ -100,6 +150,10 @@ const Share = () => {
               <span className="shareOptionText">Feelings/Activity</span>
             </div>
           </div>
+          {/* Botón de envío: se usa la imagen sendIcon */}
+          <button className="shareButton" onClick={handlePost}>
+            <img src={sendIcon} alt="send" className="sendIcon" />
+          </button>
         </div>
         {showEmojis && (
           <div className="emoji">

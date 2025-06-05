@@ -2,14 +2,16 @@ import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
   Navigate,
 } from "react-router-dom";
+
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import EditProfile from "./pages/editProfile/EditProfile";
 import Profile from "./pages/profile/Profile";
+import AdminPanel from "./pages/AdminPanel/admin"; // 👈 Nuevo import
+
 import "./style/dark.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
@@ -20,7 +22,7 @@ function App() {
   const { currentUser, loading } = useContext(AuthContext);
 
   if (loading) {
-    return <div>Cargando...</div>; // Puedes poner un spinner aquí si prefieres
+    return <div>Cargando...</div>;
   }
 
   const AuthRoute = ({ children }) => {
@@ -60,6 +62,14 @@ function App() {
       element: (
         <AuthRoute>
           <EditProfile />
+        </AuthRoute>
+      ),
+    },
+    {
+      path: "/admin", // 👈 Nueva ruta al panel de administración
+      element: (
+        <AuthRoute>
+          <AdminPanel />
         </AuthRoute>
       ),
     },
