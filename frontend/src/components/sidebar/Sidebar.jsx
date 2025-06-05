@@ -22,8 +22,6 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import ExitToAppOutlinedIcon from "@mui/icons-material/ExitToAppOutlined";
 import "./sidebar.scss";
 import MenuLink from "../menuLink/MenuLink";
-import Friends from "../friends/Friends";
-import { Users } from "../../data";
 import { DarkModeContext } from "./../../context/darkModeContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
@@ -71,12 +69,6 @@ const Sidebar = () => {
 
         <button className="sidebarButton">Show More</button>
         <hr className="sidebarHr" />
-
-        <ul className="sidebarFriendList">
-          {Users.map((u) => (
-            <Friends key={u.id} user={u} />
-          ))}
-        </ul>
       </div>
     </div>
   );

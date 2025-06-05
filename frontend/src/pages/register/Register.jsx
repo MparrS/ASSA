@@ -42,7 +42,7 @@ const Register = () => {
               photoURL: downloadURL,
             });
 
-            await setDoc(doc(db, "usersPosts", res.user.uid), { messages: [] });
+            await setDoc(doc(db, res.user.uid), { messages: [] });
             // console.log(res.user);
           });
         }

@@ -36,7 +36,7 @@ const Feed = () => {
             <Post key={post.id} post={post} />
           ))
         ) : (
-          <center>
+          <center><br/><br/>
           <p>No se encontraron publicaciones</p>
           </center>
         )}

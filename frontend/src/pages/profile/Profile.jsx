@@ -4,7 +4,6 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import "./profile.scss";
 import Rightbar from "./../../components/rightbar/Rightbar";
 import { AuthContext } from "../../context/AuthContext";
-import UsersPost from "../../components/usersPost/UsersPost";
 
 const Profile = () => {
   const { currentUser } = useContext(AuthContext);
@@ -27,7 +26,6 @@ const Profile = () => {
             </div>
           </div>
           <div className="profileRightBottom">
-            <UsersPost />
             <Rightbar profile />
           </div>
         </div>
