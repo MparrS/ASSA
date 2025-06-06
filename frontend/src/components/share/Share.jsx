@@ -11,7 +11,7 @@ import "./share.scss";
 import { AuthContext } from "../../context/AuthContext";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
-import sendIcon from "../../assets/icon/send.png"; // Importa el icono de enviar
+import sendIcon from "../../assets/icon/send.png";
 
 const Share = () => {
   const [input, setInput] = useState("");
@@ -49,7 +49,7 @@ const Share = () => {
     } catch (error) {
       console.error("Error al publicar post:", error);
     }
-    // Limpia los datos locales en caso de error o post exitoso
+    // Limpia los datos locales en caso de éxito o error
     setInput("");
     setFiles([]);
     setShowEmojis(false);
@@ -88,12 +88,12 @@ const Share = () => {
     <div className="share">
       <div className="shareWrapper">
         <div className="shareTop">
-          {/* Muestra la imagen de perfil del usuario actual */}
+          {/* Aquí se utiliza la misma lógica para renderizar la imagen del usuario */}
           <img
             src={
               currentUser.profilePicture
-                ? `/assets/people/${currentUser.profilePicture}`
-                : "/assets/profileCover/DefaultProfile.jpg"
+                ? `${process.env.PUBLIC_URL}/assets/people/${currentUser.profilePicture}`
+                : `${process.env.PUBLIC_URL}/assets/profileCover/DefaultProfile.jpg`
             }
             alt="profile"
             className="shareProfileImg"
@@ -101,7 +101,7 @@ const Share = () => {
           <textarea
             rows={2}
             style={{ resize: "none", overflow: "hidden" }}
-            placeholder={`Que tienes en mente ${currentUser.name || ""}?`}
+            placeholder={`¿Qué tienes en mente ${currentUser.name || ""}?`}
             value={input}
             className="shareInput"
             onChange={(e) => setInput(e.target.value)}
@@ -150,7 +150,7 @@ const Share = () => {
               <span className="shareOptionText">Feelings/Activity</span>
             </div>
           </div>
-          {/* Botón de envío: se usa la imagen sendIcon */}
+          {/* Botón de envío: se utiliza la imagen sendIcon */}
           <button className="shareButton" onClick={handlePost}>
             <img src={sendIcon} alt="send" className="sendIcon" />
           </button>

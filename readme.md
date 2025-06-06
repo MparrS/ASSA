@@ -21,54 +21,46 @@ ASSAA/
 │   ├── config/
 │   │   └── db.js               // Configuración de la base de datos
 │   ├── controllers/
-│   │   └── authController.js   // Lógica de autenticación
+│   │   ├── authController.js   // Controlador de autenticación
+│   │   ├── postController.js   // Controlador de publicaciones
+│   │   ├── userController.js   // Controlador de usuarios
+│   │   └── commentController.js // Controlador de comentarios
 │   ├── middleware/
 │   │   └── authMiddleware.js   // Middleware de autenticación
-│   ├── models/
-│   │   ├── empleados.js        // Modelo de empleados
-│   │   ├── publicaciones.js    // Modelo de publicaciones
-│   │   └── usuario.js          // Modelo de usuarios
 │   ├── routes/
-│   │   └── authRoutes.js       // Rutas de autenticación
-│   ├── .env                    // Variables de entorno
-│   ├── app.js                  // Archivo principal del servidor
-│   ├── package.json            // Dependencias del backend
-│   ├── package-lock.json
-│   └── docu/                   // Documentación adicional
+│   │   ├── authRoutes.js      // Rutas de autenticación
+│   │   ├── postRoutes.js      // Rutas de publicaciones
+│   │   ├── userRoutes.js      // Rutas de usuarios
+│   │   └── commentRoutes.js   // Rutas de comentarios
+│   ├── .env                   // Variables de entorno
+│   ├── app.js                 // Archivo principal del servidor
+│   ├── package.json           // Dependencias del backend
+│   └── docu/                  // Documentación adicional
+│       └── assa_mas.sql       // Script de la base de datos
 │
 ├── frontend/
-│   ├── node_modules/
 │   ├── src/
-│   │   ├── assets/
-│   │   │   └── yale.png         // Imagen/logo
-│   │   ├── components/
-│   │   │   ├── ProtectedRoute.jsx // Componente de ruta protegida
-│   │   │   └── Sidebar.jsx      // Barra lateral de navegación
-│   │   ├── pages/
-│   │   │   ├── dashboard.jsx    // Página principal (dashboard)
-│   │   │   ├── home.jsx         // Página de inicio
-│   │   │   ├── login.jsx        // Página de login
-│   │   │   ├── Perfil.jsx       // Página de perfil de usuario
-│   │   │   └── publicaciones.jsx // Página de publicaciones
-│   │   ├── services/
-│   │   │   └── api.js           // Configuración de llamadas API
-│   │   ├── App.css              // Estilos principales
-│   │   ├── App.jsx              // Componente raíz de la app
-│   │   ├── main.jsx             // Entrada principal de React
-│   ├── .gitignore               
-│   ├── eslint.config.js         // Configuración de ESLint
-│   ├── index.css                // Estilos globales
-│   ├── index.html               // HTML principal
-│   ├── package.json             // Dependencias del frontend
-│   ├── package-lock.json
-│   ├── postcss.config.js        // Configuración de PostCSS
-│   ├── README.md                
-│   ├── tailwind.config.js       // Configuración de TailwindCSS
-│   ├── vite.config.js           // Configuración de Vite
-│   ├── .gitattributes           
-│   └── LICENSE                  
+│   │   ├── assets/            // Recursos estáticos
+│   │   │   ├── images/        // Imágenes del proyecto
+│   │   │   └── icons/         // Iconos de la aplicación
+│   │   ├── components/        // Componentes reutilizables
+│   │   │   ├── navbar/        // Barra de navegación
+│   │   │   ├── sidebar/       // Barra lateral
+│   │   │   ├── post/          // Componente de publicaciones
+│   │   │   └── shared/        // Componentes compartidos
+│   │   ├── context/          // Contextos de React
+│   │   │   ├── AuthContext.js // Contexto de autenticación
+│   │   │   └── ThemeContext.js// Contexto de tema
+│   │   ├── pages/            // Páginas principales
+│   │   │   ├── home/         // Página principal
+│   │   │   ├── profile/      // Perfil de usuario
+│   │   │   └── admin/        // Panel de administración
+│   │   ├── services/         // Servicios y APIs
+│   │   └── styles/           // Estilos globales
+│   ├── public/               // Archivos públicos
+│   └── package.json          // Dependencias del frontend
 │
-└── README.md                    // Documentación general
+└── README.md                 // Documentación 
 ```
 ---
 

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-06-2025 a las 03:44:14
+-- Tiempo de generación: 06-06-2025 a las 19:29:51
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -36,16 +36,6 @@ CREATE TABLE `comments` (
   `likes` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `comments`
---
-
-INSERT INTO `comments` (`id`, `postId`, `userId`, `body`, `date`, `likes`) VALUES
-(1, 1, 1, '¡Bienvenidos!', '2/6/2025, 7:22:12 p. m.', 1),
-(2, 1, 3, 'Que buena noticia', '2/6/2025, 7:22:12 p. m.', 0),
-(3, 1, 3, 'genial', '2/6/2025, 7:29:16 p. m.', 0),
-(4, 1, 3, 'bien', '2/6/2025, 7:30:04 p. m.', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -62,16 +52,6 @@ CREATE TABLE `posts` (
   `commentsCount` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `posts`
---
-
-INSERT INTO `posts` (`id`, `userId`, `title`, `body`, `date`, `likes`, `commentsCount`) VALUES
-(1, 2, 'Nuevos Ingresos', '💫Bienvenido(s) a nuestra comunidad ASSA ABLOY COLOMBIA. Aprovechamos este espacio para darle la bienvenida a todos los nuevos miembros que se unen a nuestra familia empresarial. Esperamos que disfruten de una experiencia enriquecedora y productiva aquí. 🌐¡Esperamos que se sientan bienvenidos y que tengan una gran experiencia en nuestra empresa! 🌐', '5 mins ago', 13, 2),
-(2, 2, 'Evento Corporativo', 'Únete a nuestro próximo evento corporativo donde compartiremos novedades y oportunidades.', '10 mins ago', 5, 1),
-(3, 1, 'Anuncio Importante', 'Se actualizan nuestras políticas internas, por favor revisa los detalles en nuestro portal.', '15 mins ago', 2, 0),
-(4, 1, 'Celebración de Logros', 'Celebramos nuestros logros y reconocemos el esfuerzo de todo el equipo. ¡Felicitaciones a todos!', '20 mins ago', 8, 2);
-
 -- --------------------------------------------------------
 
 --
@@ -83,17 +63,6 @@ CREATE TABLE `post_images` (
   `postId` int(11) NOT NULL,
   `imagePath` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `post_images`
---
-
-INSERT INTO `post_images` (`id`, `postId`, `imagePath`) VALUES
-(1, 1, '/assets/posts/post1.jpg'),
-(2, 1, '/assets/posts/post2.jpg'),
-(3, 2, '/assets/posts/post3.jpg'),
-(4, 2, '/assets/posts/post4.jpg'),
-(5, 3, '/assets/posts/post5.jpg');
 
 -- --------------------------------------------------------
 
@@ -125,17 +94,17 @@ CREATE TABLE `users` (
   `ultimoLogin` datetime DEFAULT NULL,
   `profilePicture` varchar(255) DEFAULT NULL,
   `contrasena` varchar(255) DEFAULT NULL,
-  `points` int(11) DEFAULT NULL
+  `points` int(11) DEFAULT NULL,
+  `rol` enum('admin','empleado') NOT NULL DEFAULT 'empleado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `documento`, `email`, `fechaIngreso`, `cargo`, `supervisor`, `area`, `country`, `direccionLaboral`, `phone`, `age`, `language`, `celularCorporativo`, `fechaNacimiento`, `estadoCivil`, `direccionPersonal`, `linkedIn`, `estado`, `ultimoLogin`, `profilePicture`, `contrasena`, `points`) VALUES
-(1, 'Mijail Serrano', 'mijser', 1, '1@1', NULL, 'Analista', NULL, 'IT', NULL, NULL, NULL, 20, 'Spanish', NULL, NULL, 'Soltero', NULL, NULL, NULL, '2025-06-02 20:42:40', 'https://cdn.britannica.com/93/215393-050-E428CADE/Canadian-actor-musician-Ryan-Gosling-2016.jpg', '1', NULL),
-(2, 'Ioaira Vega', 'iovega', 2, '2@2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-02 18:45:25', '/assets/people/io.jpg', '2', NULL),
-(3, 'Luis Aponte', 'lucho', 3, '3@3', NULL, NULL, NULL, 'IT', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-02 19:29:59', '/assets/people/lucho.png', '3', NULL);
+INSERT INTO `users` (`id`, `name`, `username`, `documento`, `email`, `fechaIngreso`, `cargo`, `supervisor`, `area`, `country`, `direccionLaboral`, `phone`, `age`, `language`, `celularCorporativo`, `fechaNacimiento`, `estadoCivil`, `direccionPersonal`, `linkedIn`, `estado`, `ultimoLogin`, `profilePicture`, `contrasena`, `points`, `rol`) VALUES
+(1, 'Mijail Serrano', 'mijser', 1, 'mijail.serranoparra@assaabloy.com', '2025-03-15', 'Analista', NULL, 'IT', 'Colombia', 'Calle 12 #39', '+57 3203783898', 20, 'Spanish', '+57 313507736', '2006-01-11', 'Soltero', 'Calle 68# 113 D27', 'Linkedin', 'Activo', '2025-06-06 12:28:11', 'https://cdn.britannica.com/93/215393-050-E428CADE/Canadian-actor-musician-Ryan-Gosling-2016.jpg', '1', 50, 'admin'),
+(2, 'Ioaira Vega', 'iovega', 2, '2@2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-06 12:15:30', '\\assets\\people\\io.jpg', '2', NULL, 'empleado');
 
 --
 -- Índices para tablas volcadas
@@ -178,19 +147,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `post_images`
 --
 ALTER TABLE `post_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
