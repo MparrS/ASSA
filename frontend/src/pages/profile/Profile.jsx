@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import Navbar from "../../components/navbar/Navbar";
 import Sidebar from "../../components/sidebar/Sidebar";
 import "./profile.scss";
-import Rightbar from "./../../components/rightbar/Rightbar";
+import Rightbar from "../../components/rightbar/Rightbar";
 import { AuthContext } from "../../context/AuthContext";
 
 const Profile = () => {
@@ -14,15 +14,11 @@ const Profile = () => {
         <Sidebar />
         <div className="profileRight">
           <div className="profileRightTop">
-          
-              <img
-                src={currentUser.profilePicture}
-                alt=""
-                className="profileUserImg"
-              />
-        
+            {/* Se eliminó la imagen grande */}
             <div className="profileInfo">
-              <h4 className="profileInfoName">{currentUser.displayName}</h4>
+              <h4 className="profileInfoName">
+                {currentUser.displayName}
+              </h4>
             </div>
           </div>
           <div className="profileRightBottom">

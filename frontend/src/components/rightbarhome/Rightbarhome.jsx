@@ -1,6 +1,5 @@
 
 import React from "react";
-import Online from "../online/Online";
 import "./rightbarhome.scss";
 
 const Rightbarhome = () => {

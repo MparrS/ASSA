@@ -1,5 +1,6 @@
+// AuthContext.js
 import { createContext, useState, useEffect } from "react";
-import API from "../pages/services/api"; // Asegúrate de que esta ruta sea correcta
+import API from "../pages/services/api"; // Asegúrate de que la ruta sea correcta
 
 export const AuthContext = createContext();
 
@@ -17,7 +18,6 @@ export const AuthContextProvider = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // Revisa en consola la estructura del usuario recibido
         console.log("Usuario obtenido:", response.data.usuario);
         setCurrentUser(response.data.usuario);
       } catch (err) {
@@ -35,9 +35,9 @@ export const AuthContextProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (documento, contrasena) => {
     try {
-      const response = await API.post("/api/auth/login", { email, password });
+      const response = await API.post("/api/auth/login", { documento, contrasena });
       const { token, usuario } = response.data;
       localStorage.setItem("token", token);
       setCurrentUser(usuario);
@@ -54,9 +54,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ currentUser, setCurrentUser, login, logout, loading }}
-    >
+    <AuthContext.Provider value={{ currentUser, setCurrentUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

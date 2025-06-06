@@ -10,7 +10,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import EditProfile from "./pages/editProfile/EditProfile";
 import Profile from "./pages/profile/Profile";
-import AdminPanel from "./pages/AdminPanel/admin";
+import AdminPanel from "./pages/AdminPanel/AdminPanel";
 
 import "./style/dark.scss";
 import { useContext } from "react";

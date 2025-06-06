@@ -8,11 +8,14 @@ const ProfileRightBar = () => {
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    // Función para obtener la info del usuario desde el endpoint (MySQL)
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch(`/api/users/${currentUser.id}`);
+        const res = await fetch(`http://localhost:3001/api/users/${currentUser.id}`);
+        if (!res.ok) {
+          throw new Error("Error en la red");
+        }
         const data = await res.json();
+        console.log("Datos del usuario:", data);
         setUserInfo(data);
       } catch (err) {
         console.error("Error fetching user info:", err);
@@ -24,92 +27,52 @@ const ProfileRightBar = () => {
     }
   }, [currentUser]);
 
-  // Mientras no se cargue la info, usamos los datos del currentUser
+  const isAdmin =
+    (userInfo?.rol === "admin") || (currentUser?.rol === "admin");
+
   return (
     <div className="profileRightBar">
       <div className="profileRightBarHeading">
         <span className="profileRightBarTitle">User Information</span>
-        <Link to={`/profile/${currentUser.id}/edit`} style={{ textDecoration: "none" }}>
-          <span className="editButton">Edit Profile</span>
-        </Link>
-      </div>
-
-      <div className="profileRightBarInfo">
-        <div className="profileRightBarInfoItem">
-          <span className="profileRightBarInfoKey">Email: </span>
-          <span className="profileRightBarInfoValue">
-            { userInfo?.email || currentUser.email }
-          </span>
-        </div>
-        <div className="profileRightBarInfoItem">
-          <span className="profileRightBarInfoKey">Phone Number: </span>
-          <span className="profileRightBarInfoValue">
-            { userInfo?.phone || currentUser.phone }
-          </span>
-        </div>
-        <div className="profileRightBarInfoItem">
-          <span className="profileRightBarInfoKey">Language: </span>
-          <span className="profileRightBarInfoValue">
-            { userInfo?.language || currentUser.language }
-          </span>
-        </div>
-        <div className="profileRightBarInfoItem">
-          <span className="profileRightBarInfoKey">Country: </span>
-          <span className="profileRightBarInfoValue">
-            { userInfo?.country || currentUser.country }
-          </span>
+        <div className="actionButtons">
+          <Link to={`/profile/${currentUser.id}/edit`} style={{ textDecoration: "none" }}>
+            <span className="editButton">Edit Profile</span>
+          </Link>
+          {isAdmin && (
+            <Link to={`/admin`} style={{ textDecoration: "none" }}>
+              <span className="adminButton">Admin Panel</span>
+            </Link>
+          )}
         </div>
       </div>
 
-      <h4 className="profileRightBarTitle">Close Friends</h4>
-      <div className="profileRightBarFollowings">
-        <div className="profileRightBarFollowing">
-          <img
-            src="/assets/person/friend1.jpg"
-            alt=""
-            className="profileRightBarFollowingImg"
-          />
-          <span className="profileRightBarFollowingName">Janet</span>
-        </div>
-        <div className="profileRightBarFollowing">
-          <img
-            src="/assets/person/friend2.jpg"
-            alt=""
-            className="profileRightBarFollowingImg"
-          />
-          <span className="profileRightBarFollowingName">Isabella</span>
-        </div>
-        <div className="profileRightBarFollowing">
-          <img
-            src="/assets/person/friend3.jpg"
-            alt=""
-            className="profileRightBarFollowingImg"
-          />
-          <span className="profileRightBarFollowingName">Beverly</span>
-        </div>
-        <div className="profileRightBarFollowing">
-          <img
-            src="/assets/person/friend4.jpg"
-            alt=""
-            className="profileRightBarFollowingImg"
-          />
-          <span className="profileRightBarFollowingName">Glenna</span>
-        </div>
-        <div className="profileRightBarFollowing">
-          <img
-            src="/assets/person/friend5.jpg"
-            alt=""
-            className="profileRightBarFollowingImg"
-          />
-          <span className="profileRightBarFollowingName">Alexis</span>
-        </div>
-        <div className="profileRightBarFollowing">
-          <img
-            src="/assets/person/friend6.jpg"
-            alt=""
-            className="profileRightBarFollowingImg"
-          />
-          <span className="profileRightBarFollowingName">Kate</span>
+      <div className="userInfoCard">
+        <div className="userInfoRow">
+          <div className="userImageContainer">
+            <img
+              src={userInfo?.profilePicture || currentUser.profilePicture}
+              alt="User Profile"
+              className="userImage"
+            />
+          </div>
+          <div className="userTextInfo">
+            <div className="userInfoHeader">
+              <div className="userName">
+                {userInfo?.displayName || currentUser.displayName || "Usuario"}
+              </div>
+              <div className="userRole">
+                {(userInfo?.rol || currentUser.rol || "N/A").toUpperCase()}
+              </div>
+            </div>
+            <div className="userDetails">
+              <p><strong>Email:</strong> {userInfo?.email || currentUser.email}</p>
+              <p><strong>Phone:</strong> {userInfo?.phone || currentUser.phone}</p>
+              <p><strong>Language:</strong> {userInfo?.language || currentUser.language}</p>
+              <p><strong>Country:</strong> {userInfo?.country || currentUser.country}</p>
+              <p><strong>Puntos:</strong> {userInfo?.puntos || currentUser.puntos || 0}</p>
+              <p><strong>Dirección Laboral:</strong> {userInfo?.direccionLaboral || currentUser.direccionLaboral || "N/A"}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

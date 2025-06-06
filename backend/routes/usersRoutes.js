@@ -3,13 +3,13 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
-// GET: Obtener información del usuario por su ID
+// GET: Obtener información del usuario por su ID (incluyendo rol)
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const connection = await db;
     const query = `
-      SELECT id, name, username, email, profilePicture, phone, country
+      SELECT id, name, username, email, profilePicture, phone, country, rol
       FROM users
       WHERE id = ?
     `;
@@ -28,27 +28,22 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    // Campos que se esperan actualizar. Ajusta según tu esquema de DB.
-    const { name, phone, country, profilePicture } = req.body;
+    // Se esperan actualizar los siguientes campos
+    const { name, phone, country, profilePicture, rol } = req.body;
     const connection = await db;
     const updateQuery = `
       UPDATE users 
-      SET name = ?, phone = ?, country = ?, profilePicture = ?
+      SET name = ?, phone = ?, country = ?, profilePicture = ?, rol = ?
       WHERE id = ?
     `;
-    const [result] = await connection.promise().execute(updateQuery, [
-      name,
-      phone,
-      country,
-      profilePicture,
-      id,
-    ]);
+    const [result] = await connection
+      .promise()
+      .execute(updateQuery, [name, phone, country, profilePicture, rol, id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
-    // Recuperamos la información actualizada
     const selectQuery = `
-      SELECT id, name, username, email, profilePicture, phone, country
+      SELECT id, name, username, email, profilePicture, phone, country, rol
       FROM users
       WHERE id = ?
     `;
