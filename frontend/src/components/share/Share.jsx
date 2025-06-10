@@ -1,11 +1,11 @@
 import React, { useContext, useState, useRef } from "react";
-import { 
-  Close, 
-  EmojiEmotions, 
-  PermMedia, 
-  VideoCameraFront, 
-  ArrowBackIos, 
-  ArrowForwardIos 
+import {
+  Close,
+  EmojiEmotions,
+  PermMedia,
+  VideoCameraFront,
+  ArrowBackIos,
+  ArrowForwardIos
 } from "@mui/icons-material";
 import "./share.scss";
 import { AuthContext } from "../../context/AuthContext";
@@ -90,12 +90,8 @@ const Share = () => {
         <div className="shareTop">
           {/* Aquí se utiliza la misma lógica para renderizar la imagen del usuario */}
           <img
-            src={
-              currentUser.profilePicture
-                ? `${process.env.PUBLIC_URL}/assets/people/${currentUser.profilePicture}`
-                : `${process.env.PUBLIC_URL}/assets/profileCover/DefaultProfile.jpg`
-            }
-            alt="profile"
+            src={currentUser.profilePicture}
+            alt={currentUser.name}
             className="shareProfileImg"
           />
           <textarea

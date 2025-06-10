@@ -51,10 +51,7 @@ const Navbar = ({ setView }) => {
             <PeopleAltIcon />
           </div>
 
-          <div className="navbarIconItem">
-            <ChatBubbleIcon />
-            <span className="navbarIconBadge">10</span>
-          </div>
+          
         </div>
       </div>
 

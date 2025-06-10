@@ -1,6 +1,8 @@
 
 import React from "react";
 import "./rightbarhome.scss";
+import actividadesAd from '../../assets/ads/actividades.png';
+import YaleAd from '../../assets/ads/yalemas.jpeg';
 
 const Rightbarhome = () => {
   return (
@@ -15,7 +17,14 @@ const Rightbarhome = () => {
           <b>Sarah Dane</b> and <b>other friends</b> have a birthday today
         </span>
       </div>
-      <img src="/assets/ads/adv.jpg" alt="" className="rightbarAdvert" />
+      <a href="https://sites.google.com/gointegro.com/well-being-live-activities/mayo-maio-25?authuser=0">
+        <img src={actividadesAd} alt="" className="rightbarAdvert" />
+      </a>
+
+    <a href="https://www.yalehome.com.co/">
+        <img src={YaleAd} alt="" className="rightbarAdvert" />
+      </a>
+
     </div>
   );
 };
