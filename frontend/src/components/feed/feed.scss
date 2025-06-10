@@ -1,7 +1,50 @@
-.feed{
-    flex: 6;
-   
-    .feedWrapper{
-        padding: 20px;
+.feed {
+  flex: 6;
+
+  .feedWrapper {
+    padding: 20px;
+  }
+
+  .spaceHeader {
+    margin-bottom: 20px;
+
+    .spaceCover {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
     }
+
+    .spaceInfo {
+      display: flex;
+      align-items: center;
+      margin-top: -50px;
+      background-color: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1;
+
+      .spaceIcon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        margin-right: 20px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      p {
+        margin: 5px 0 0;
+        color: #666;
+        font-size: 14px;
+      }
+    }
+  }
 }
