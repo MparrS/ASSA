@@ -1,3 +1,5 @@
+// App.js
+import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
@@ -13,7 +15,6 @@ import Profile from "./pages/profile/Profile";
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
 
 import "./style/dark.scss";
-import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/AuthContext";
 
@@ -43,6 +44,14 @@ function App() {
     },
     {
       path: "/",
+      element: (
+        <AuthRoute>
+          <Home />
+        </AuthRoute>
+      ),
+    },
+    {
+      path: "/space/:spaceId",
       element: (
         <AuthRoute>
           <Home />
