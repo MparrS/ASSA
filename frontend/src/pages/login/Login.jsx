@@ -85,13 +85,6 @@ const Login = () => {
                   Iniciar Sesión
                 </button>
 
-                <span>¿Primer ingreso?</span>
-                <Link to="/register">
-                  <button className="loginRegisterButton">
-                    Obtén tu acceso aquí
-                  </button>
-                </Link>
-
                 {error && (
                   <span className="errorText">
                     {error}
