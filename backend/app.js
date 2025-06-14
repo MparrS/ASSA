@@ -6,7 +6,8 @@ const fs = require("fs");
 const postsRoutes = require("./routes/postsRoutes");
 const authRoutes = require("./routes/authRoutes");
 const commentsRoutes = require("./routes/commentsRoutes");
-const usersRoutes = require("./routes/usersRoutes");  // Importa las rutas de usuarios
+const usersRoutes = require("./routes/usersRoutes"); 
+const spacesRoutes = require("./routes/spacesRoutes"); 
 
 // Definir la ruta absoluta para la carpeta de imágenes en el frontend
 // Se asume que BACKEND y frontend están al mismo nivel
@@ -17,12 +18,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Servir archivos estáticos de assets
 app.use("/assets", express.static(path.join(__dirname, "..", "frontend", "public", "assets")));
 
+// Rutas de la API
 app.use("/api/posts", postsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/comments", commentsRoutes);
-app.use("/api/users", usersRoutes);  // Monta las rutas de usuarios
+app.use("/api/users", usersRoutes);  
+app.use("/spaces", spacesRoutes);
 
 app.get("/", (req, res) => {
   res.send("API funcionando");

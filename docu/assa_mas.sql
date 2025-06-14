@@ -1,15 +1,15 @@
 -- phpMyAdmin SQL Dump
 -- Base de datos: `assa_mas`
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone = '+00:00';
 
 /*!40101 SET NAMES utf8mb4 */;
 
-------------------------------
+-- ------------------------------
 -- Estructura de la tabla `comments`
-------------------------------
+-- ------------------------------
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -26,9 +26,9 @@ CREATE TABLE `comments` (
 INSERT INTO `comments` (`id`, `postId`, `userId`, `body`, `date`, `likes`) VALUES
 (18, 28, 1, 'LOL', '10/6/2025, 10:40:17 a. m.', 0);
 
-------------------------------
+-- ------------------------------
 -- Estructura de la tabla `posts`
-------------------------------
+-- ------------------------------
 DROP TABLE IF EXISTS `posts`;
 CREATE TABLE `posts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -47,9 +47,9 @@ CREATE TABLE `posts` (
 INSERT INTO `posts` (`id`, `userId`, `title`, `body`, `date`, `likes`, `commentsCount`, `spaceId`) VALUES
 (28, 1, '', 'Bienvenidos a Assaabloy !', '2025-06-10T15:40:11.268Z', 1, 0, NULL);
 
-------------------------------
+-- ------------------------------
 -- Estructura de la tabla `post_images`
-------------------------------
+-- ------------------------------
 DROP TABLE IF EXISTS `post_images`;
 CREATE TABLE `post_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -63,9 +63,9 @@ INSERT INTO `post_images` (`id`, `postId`, `imagePath`) VALUES
 (45, 28, 'http://localhost:3001/assets/posts/1749570011260.jpg'),
 (46, 28, 'http://localhost:3001/assets/posts/1749570011263.jpg');
 
-------------------------------
+-- ------------------------------
 -- Estructura de la tabla `spaces`
-------------------------------
+-- ------------------------------
 DROP TABLE IF EXISTS `spaces`;
 CREATE TABLE `spaces` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -81,9 +81,9 @@ INSERT INTO `spaces` (`id`, `name`, `description`, `userId`) VALUES
 (2, 'Gestion Humana', 'Espacio para la gestión humana de la empresa', 2),
 (3, 'Espacio Creativo', 'Espacio destinado a ideas y creatividad', 2);
 
-------------------------------
+-- ------------------------------
 -- Estructura de la tabla `users`
-------------------------------
+-- ------------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

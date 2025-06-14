@@ -1,6 +1,5 @@
-// AuthContext.js
 import { createContext, useState, useEffect } from "react";
-import API from "../pages/services/api"; // Asegúrate de que la ruta sea correcta
+import API from "../pages/services/api";
 
 export const AuthContext = createContext();
 
