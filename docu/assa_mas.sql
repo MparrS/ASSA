@@ -1,77 +1,92 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 06-06-2025 a las 19:29:51
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Base de datos: `assa_mas`
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone = '+00:00';
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Base de datos: `assa_mas`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `comments`
---
-
+-- ------------------------------
+-- Estructura de la tabla `comments`
+-- ------------------------------
+DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `postId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `body` text DEFAULT NULL,
   `date` varchar(50) DEFAULT NULL,
-  `likes` int(11) DEFAULT 0
+  `likes` int(11) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `postId` (`postId`),
+  KEY `userId` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+INSERT INTO `comments` (`id`, `postId`, `userId`, `body`, `date`, `likes`) VALUES
+(18, 28, 1, 'LOL', '10/6/2025, 10:40:17 a. m.', 0);
 
---
--- Estructura de tabla para la tabla `posts`
---
-
+-- ------------------------------
+-- Estructura de la tabla `posts`
+-- ------------------------------
+DROP TABLE IF EXISTS `posts`;
 CREATE TABLE `posts` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `body` text DEFAULT NULL,
   `date` varchar(50) DEFAULT NULL,
   `likes` int(11) DEFAULT 0,
-  `commentsCount` int(11) DEFAULT 0
+  `commentsCount` int(11) DEFAULT 0,
+  `spaceId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`),
+  KEY `posts_space_fk` (`spaceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+INSERT INTO `posts` (`id`, `userId`, `title`, `body`, `date`, `likes`, `commentsCount`, `spaceId`) VALUES
+(28, 1, '', 'Bienvenidos a Assaabloy !', '2025-06-10T15:40:11.268Z', 1, 0, NULL);
 
---
--- Estructura de tabla para la tabla `post_images`
---
-
+-- ------------------------------
+-- Estructura de la tabla `post_images`
+-- ------------------------------
+DROP TABLE IF EXISTS `post_images`;
 CREATE TABLE `post_images` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `postId` int(11) NOT NULL,
-  `imagePath` varchar(255) DEFAULT NULL
+  `imagePath` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `postId` (`postId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+INSERT INTO `post_images` (`id`, `postId`, `imagePath`) VALUES
+(45, 28, 'http://localhost:3001/assets/posts/1749570011260.jpg'),
+(46, 28, 'http://localhost:3001/assets/posts/1749570011263.jpg');
 
---
--- Estructura de tabla para la tabla `users`
---
+-- ------------------------------
+-- Estructura de la tabla `spaces`
+-- ------------------------------
+DROP TABLE IF EXISTS `spaces`;
+CREATE TABLE `spaces` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `userId` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `spaces` (`id`, `name`, `description`, `userId`) VALUES
+(1, 'Espacio IT', 'Espacio para compartir noticias y proyectos de IT', 1),
+(2, 'Gestion Humana', 'Espacio para la gestión humana de la empresa', 2),
+(3, 'Espacio Creativo', 'Espacio destinado a ideas y creatividad', 2);
+
+-- ------------------------------
+-- Estructura de la tabla `users`
+-- ------------------------------
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `documento` bigint(20) DEFAULT NULL,
@@ -95,102 +110,21 @@ CREATE TABLE `users` (
   `profilePicture` varchar(255) DEFAULT NULL,
   `contrasena` varchar(255) DEFAULT NULL,
   `points` int(11) DEFAULT NULL,
-  `rol` enum('admin','empleado') NOT NULL DEFAULT 'empleado'
+  `rol` enum('admin','empleado') NOT NULL DEFAULT 'empleado',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `users`
---
+INSERT INTO `users` (
+  `id`, `name`, `username`, `documento`, `email`, `fechaIngreso`, 
+  `cargo`, `supervisor`, `area`, `country`, `direccionLaboral`, `phone`, 
+  `age`, `language`, `celularCorporativo`, `fechaNacimiento`, `estadoCivil`, 
+  `direccionPersonal`, `linkedIn`, `estado`, `ultimoLogin`, `profilePicture`, 
+  `contrasena`, `points`, `rol`
+) VALUES
+(1, 'Mijail Serrano', 'mijser', 1, 'mijail.serranoparra@assaabloy.com', '2025-03-15', 'Analista', NULL, 'IT', 'Colombia', 'Calle 12# 115 D23', '+57 3203783898', 20, 'Spanish', '+57 313507736', '2006-01-11', 'Soltero', 'Calle 68# 113 D27', 'Linkedin', 'Activo', '2025-06-11 12:19:04', 'https://cdn.britannica.com/93/215393-050-E428CADE/Canadian-actor-musician-Ryan-Gosling-2016.jpg', '1', 50, 'admin'),
+(2, 'Ioaira Vega', 'iovega', 2, '2@2', NULL, NULL, NULL, NULL, NULL, 'CLJ 69 # #112 D-22', '+57 3135207736', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-09 10:49:51', '\\assets\\people\\io.jpg', '2', 10, 'empleado');
 
-INSERT INTO `users` (`id`, `name`, `username`, `documento`, `email`, `fechaIngreso`, `cargo`, `supervisor`, `area`, `country`, `direccionLaboral`, `phone`, `age`, `language`, `celularCorporativo`, `fechaNacimiento`, `estadoCivil`, `direccionPersonal`, `linkedIn`, `estado`, `ultimoLogin`, `profilePicture`, `contrasena`, `points`, `rol`) VALUES
-(1, 'Mijail Serrano', 'mijser', 1, 'mijail.serranoparra@assaabloy.com', '2025-03-15', 'Analista', NULL, 'IT', 'Colombia', 'Calle 12 #39', '+57 3203783898', 20, 'Spanish', '+57 313507736', '2006-01-11', 'Soltero', 'Calle 68# 113 D27', 'Linkedin', 'Activo', '2025-06-06 12:28:11', 'https://cdn.britannica.com/93/215393-050-E428CADE/Canadian-actor-musician-Ryan-Gosling-2016.jpg', '1', 50, 'admin'),
-(2, 'Ioaira Vega', 'iovega', 2, '2@2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-06 12:15:30', '\\assets\\people\\io.jpg', '2', NULL, 'empleado');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `comments`
---
-ALTER TABLE `comments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `postId` (`postId`),
-  ADD KEY `userId` (`userId`);
-
---
--- Indices de la tabla `posts`
---
-ALTER TABLE `posts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `userId` (`userId`);
-
---
--- Indices de la tabla `post_images`
---
-ALTER TABLE `post_images`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `postId` (`postId`);
-
---
--- Indices de la tabla `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `comments`
---
-ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT de la tabla `posts`
---
-ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT de la tabla `post_images`
---
-ALTER TABLE `post_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
-
---
--- AUTO_INCREMENT de la tabla `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `comments`
---
-ALTER TABLE `comments`
-  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`postId`) REFERENCES `posts` (`id`),
-  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
-
---
--- Filtros para la tabla `posts`
---
-ALTER TABLE `posts`
-  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
-
---
--- Filtros para la tabla `post_images`
---
-ALTER TABLE `post_images`
-  ADD CONSTRAINT `post_images_ibfk_1` FOREIGN KEY (`postId`) REFERENCES `posts` (`id`);
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;

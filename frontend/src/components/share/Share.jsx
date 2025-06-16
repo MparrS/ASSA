@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import {
   Close,
   EmojiEmotions,
@@ -15,20 +15,39 @@ import sendIcon from "../../assets/icon/send.png";
 
 const Share = () => {
   const [input, setInput] = useState("");
-  const [files, setFiles] = useState([]); // Para almacenar múltiples archivos adjuntos
+  const [files, setFiles] = useState([]);
   const [showEmojis, setShowEmojis] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const carouselRef = useRef(null);
 
-  if (!currentUser) {
-    console.error("No hay usuario actual definido");
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/api/users/${currentUser.id}`);
+        if (!res.ok) throw new Error("Error al obtener datos del usuario");
+        const data = await res.json();
+        setUserInfo(data);
+      } catch (error) {
+        console.error("Error al cargar datos del usuario:", error);
+      }
+    };
+
+    if (currentUser?.id) {
+      fetchUserInfo();
+    }
+  }, [currentUser]);
+
+  const userToDisplay = userInfo || currentUser;
+
+  if (!userToDisplay) {
     return null;
   }
 
   const handlePost = async () => {
     const formData = new FormData();
-    formData.append("uid", currentUser.id);
-    formData.append("displayName", currentUser.name || "Usuario");
+    formData.append("uid", userToDisplay.id);
+    formData.append("displayName", userToDisplay.name || "Usuario");
     formData.append("content", input);
     files.forEach(file => {
       formData.append("image", file);
@@ -39,17 +58,13 @@ const Share = () => {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) {
-        throw new Error("Error al publicar el post");
-      }
-      const posted = await res.json();
-      console.log("Post publicado:", posted);
-      // Recargar la página después de publicar
+      if (!res.ok) throw new Error("Error al publicar el post");
+      await res.json();
       window.location.reload();
     } catch (error) {
       console.error("Error al publicar post:", error);
     }
-    // Limpia los datos locales en caso de éxito o error
+
     setInput("");
     setFiles([]);
     setShowEmojis(false);
@@ -88,16 +103,15 @@ const Share = () => {
     <div className="share">
       <div className="shareWrapper">
         <div className="shareTop">
-          {/* Aquí se utiliza la misma lógica para renderizar la imagen del usuario */}
           <img
-            src={currentUser.profilePicture}
-            alt={currentUser.name}
+            src={userToDisplay.profilePicture}
+            alt={userToDisplay.name}
             className="shareProfileImg"
           />
           <textarea
             rows={2}
             style={{ resize: "none", overflow: "hidden" }}
-            placeholder={`¿Qué tienes en mente ${currentUser.name || ""}?`}
+            placeholder={`¿Qué tienes en mente ${userToDisplay.name || ""}?`}
             value={input}
             className="shareInput"
             onChange={(e) => setInput(e.target.value)}
@@ -111,11 +125,7 @@ const Share = () => {
             <div className="shareImgCarousel" ref={carouselRef}>
               {files.map((file, index) => (
                 <div key={index} className="shareImgPreview">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="preview"
-                    className="shareImg"
-                  />
+                  <img src={URL.createObjectURL(file)} alt="preview" className="shareImg" />
                   <Close className="shareCancelImg" onClick={() => removeImage(index)} />
                 </div>
               ))}
@@ -146,7 +156,6 @@ const Share = () => {
               <span className="shareOptionText">Feelings/Activity</span>
             </div>
           </div>
-          {/* Botón de envío: se utiliza la imagen sendIcon */}
           <button className="shareButton" onClick={handlePost}>
             <img src={sendIcon} alt="send" className="sendIcon" />
           </button>

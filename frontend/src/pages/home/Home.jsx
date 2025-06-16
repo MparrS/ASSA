@@ -1,3 +1,4 @@
+// Home.jsx
 import React, { useState } from "react";
 import Feed from "../../components/feed/Feed";
 import Rewards from "../../components/rewards/Rewards";
@@ -7,14 +8,15 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import "./home.scss";
 
 const Home = () => {
-  const [view, setView] = useState("feed"); 
+  // Puedes mantener el estado para cambiar entre feed y rewards, si lo deseas.
+  const [view, setView] = useState("feed");
 
   return (
     <div className="home">
       <Navbar setView={setView} />
       <div className="homeContainer">
         <Sidebar />
-        {view === "feed" ? <Feed /> : <Rewards/>}
+        {view === "feed" ? <Feed /> : <Rewards />}
         <Rightbar />
       </div>
     </div>
