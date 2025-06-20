@@ -20,8 +20,9 @@ app.use("/assets", express.static(path.join(__dirname, "..", "frontend", "public
 app.use("/api/posts",    postsRoutes);
 app.use("/api/auth",     authRoutes);
 app.use("/api/comments", commentsRoutes);
-app.use("/api/users",    usersRoutes);
-app.use("/api/spaces",   spacesRoutes);
+app.use("/api/users", usersRoutes);  
+app.use("/api/spaces", spacesRoutes);
+
 
 app.get("/", (req, res) => res.send("API funcionando"));
 
