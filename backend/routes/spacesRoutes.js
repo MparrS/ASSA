@@ -1,7 +1,9 @@
-const express = require('express');
+// backend/routes/spacesRoutes.js
+const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
+// Query devuelve espacios + posts + comentarios + imágenes
 const getSpacesQuery = `
   SELECT 
     s.id AS spaceId,
@@ -36,74 +38,58 @@ const getSpacesQuery = `
   ORDER BY s.id, p.id, c.id;
 `;
 
-function formatSpacesData(results) {
+// Auxiliar para agrupar filas en objetos anidados
+function formatSpacesData(rows) {
   const spaces = [];
-  const spacesMap = {};
-
-  results.forEach(row => {
-    if (!spacesMap[row.spaceId]) {
-      spacesMap[row.spaceId] = {
-        id: row.spaceId,
-        name: row.spaceName,
-        description: row.spaceDescription,
-        user: {
-          id: row.spaceUserId,
-          name: row.spaceUserName
-        },
+  const map = {};
+  rows.forEach(r => {
+    if (!map[r.spaceId]) {
+      map[r.spaceId] = {
+        id: r.spaceId,
+        name: r.spaceName,
+        description: r.spaceDescription,
+        user: { id: r.spaceUserId, name: r.spaceUserName },
         posts: []
       };
-      spaces.push(spacesMap[row.spaceId]);
+      spaces.push(map[r.spaceId]);
     }
-
-    if (row.postId) {
-      let post = spacesMap[row.spaceId].posts.find(p => p.id === row.postId);
+    if (r.postId) {
+      let post = map[r.spaceId].posts.find(p => p.id === r.postId);
       if (!post) {
         post = {
-          id: row.postId,
-          title: row.postTitle,
-          body: row.postBody,
-          date: row.postDate,
-          likes: row.postLikes,
-          commentsCount: row.commentsCount,
-          user: {
-            id: row.postUserId,
-            name: row.postUserName
-          },
+          id: r.postId,
+          title: r.postTitle,
+          body: r.postBody,
+          date: r.postDate,
+          likes: r.postLikes,
+          commentsCount: r.postCommentsCount,
+          user: { id: r.postUserId, name: r.postUserName },
           comments: [],
           images: []
         };
-        spacesMap[row.spaceId].posts.push(post);
+        map[r.spaceId].posts.push(post);
       }
-
-      if (row.commentId && !post.comments.find(c => c.id === row.commentId)) {
+      if (r.commentId && !post.comments.find(c => c.id === r.commentId)) {
         post.comments.push({
-          id: row.commentId,
-          body: row.commentBody,
-          date: row.commentDate,
-          user: {
-            id: row.commentUserId,
-            name: row.commentUserName
-          }
+          id: r.commentId,
+          body: r.commentBody,
+          date: r.commentDate,
+          user: { id: r.commentUserId, name: r.commentUserName }
         });
       }
-
-      if (row.postImage && !post.images.includes(row.postImage)) {
-        post.images.push(row.postImage);
+      if (r.postImage && !post.images.includes(r.postImage)) {
+        post.images.push(r.postImage);
       }
     }
   });
-
   return spaces;
 }
 
-router.get('/', (req, res) => {
-  db.query(getSpacesQuery, (error, results) => {
-    if (error) {
-      console.error('Error en la consulta:', error);
-      return res.status(500).json({ error: 'Error en la consulta de la base de datos.' });
-    }
-
-    const spaces = formatSpacesData(results);
+// GET /api/spaces → lista de todos los espacios
+router.get("/", (req, res) => {
+  db.query(getSpacesQuery, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    const spaces = formatSpacesData(rows);
     res.json({ spaces });
   });
 });
