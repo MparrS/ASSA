@@ -47,9 +47,12 @@ const Navbar = ({ setView }) => {
 
       <div className="navbarRight">
         <div className="navbarIcons">
-          <div className="navbarIconItem" onClick={() => setView("feed")}>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="navbarIconItem" onClick={() => setView("feed")}>
             <HomeIcon />
           </div>
+          </Link>
+        
           <div className="navbarIconItem"><StarOutlineIcon /></div>
           <div className="navbarIconItem" onClick={() => setView("rewards")}>
             <WalletIcon />
@@ -69,13 +72,12 @@ const Navbar = ({ setView }) => {
             />
           </Link>
         )}
-
-        <div className="navbarIcons">
+    {/*  <div className="navbarIcons">
           <div className="navbarIconItem">
             <NotificationsIcon />
             <span className="navbarIconBadge">8</span>
           </div>
-        </div>
+        </div>*/}
       </div>
     </div>
   );
