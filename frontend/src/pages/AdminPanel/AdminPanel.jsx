@@ -142,7 +142,6 @@ export default function AdminPanel() {
             <div className="admin-card">
               <p><strong>Bienvenido, {userName}</strong></p>
               <p>Rol: {currentUser?.rol?.toUpperCase() || "N/A"}</p>
-              <p>Puntos: {currentUser?.points || 0}</p>
             </div>
 
             <div className="admin-card">

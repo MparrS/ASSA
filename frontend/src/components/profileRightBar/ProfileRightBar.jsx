@@ -1,46 +1,38 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { DarkModeContext } from "../../context/darkModeContext.js";
 import "./profileRightBar.scss";
 
 const ProfileRightBar = () => {
   const { currentUser } = useContext(AuthContext);
-  const [userInfo, setUserInfo] = useState(null);
+  const { darkMode } = useContext(DarkModeContext);
+  const [info, setInfo] = useState(null);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const res = await fetch(`http://localhost:3001/api/users/${currentUser.id}`);
-        if (!res.ok) {
-          throw new Error("Error en la red");
-        }
-        const data = await res.json();
-        console.log("Datos del usuario:", data);
-        setUserInfo(data);
-      } catch (err) {
-        console.error("Error fetching user info:", err);
-      }
-    };
-
-    if (currentUser && currentUser.id) {
-      fetchUserInfo();
-    }
+    if (!currentUser?.id) return;
+    fetch(`http://localhost:3001/api/users/${currentUser.id}`)
+      .then(r => r.json())
+      .then(setInfo)
+      .catch(console.error);
   }, [currentUser]);
 
-  const isAdmin =
-    (userInfo?.rol === "admin") || (currentUser?.rol === "admin");
+  const user = info || currentUser;
+  const esAdmin = user.rol === "admin";
 
   return (
-    <div className="profileRightBar">
+    <div className={`profileRightBar ${darkMode ? "dark" : ""}`}>
       <div className="profileRightBarHeading">
-        <span className="profileRightBarTitle">User Information</span>
+        <span className="profileRightBarTitle">
+          Información de {user.name || user.username}
+        </span>
         <div className="actionButtons">
-          <Link to={`/profile/${currentUser.id}/edit`} style={{ textDecoration: "none" }}>
-            <span className="editButton">Edit Profile</span>
+          <Link to={`/profile/${user.id}/edit`} className="editButton">
+            Editar perfil
           </Link>
-          {isAdmin && (
-            <Link to={`/admin`} style={{ textDecoration: "none" }}>
-              <span className="adminButton">Admin Panel</span>
+          {esAdmin && (
+            <Link to="/admin" className="adminButton">
+              Panel admin
             </Link>
           )}
         </div>
@@ -50,27 +42,38 @@ const ProfileRightBar = () => {
         <div className="userInfoRow">
           <div className="userImageContainer">
             <img
-              src={userInfo?.profilePicture || currentUser.profilePicture}
-              alt="User Profile"
+              src={
+                user.profilePicture ||
+                "/assets/profileCover/DefaultProfile.jpg"
+              }
+              alt={user.name}
               className="userImage"
             />
           </div>
           <div className="userTextInfo">
             <div className="userInfoHeader">
-              <div className="userName">
-                {userInfo?.displayName || currentUser.displayName || "Usuario"}
-              </div>
+              <div className="userName">{user.name || user.username}</div>
               <div className="userRole">
-                {(userInfo?.rol || currentUser.rol || "N/A").toUpperCase()}
+                {(user.rol || "empleado").toUpperCase()}
               </div>
             </div>
             <div className="userDetails">
-              <p><strong>Email:</strong> {userInfo?.email || currentUser.email}</p>
-              <p><strong>Phone:</strong> {userInfo?.phone || currentUser.phone}</p>
-              <p><strong>Language:</strong> {userInfo?.language || currentUser.language}</p>
-              <p><strong>Country:</strong> {userInfo?.country || currentUser.country}</p>
-              <p><strong>Puntos:</strong> {userInfo?.puntos || currentUser.puntos || 0}</p>
-              <p><strong>Dirección Laboral:</strong> {userInfo?.direccionLaboral || currentUser.direccionLaboral || "N/A"}</p>
+              <p>
+                <strong>Email:</strong> {user.email}
+              </p>
+              <p>
+                <strong>Teléfono:</strong> {user.phone || "–"}
+              </p>
+              <p>
+                <strong>País:</strong> {user.country || "–"}
+              </p>
+              <p>
+                <strong>Puntos:</strong> {user.points ?? 0}
+              </p>
+              <p>
+                <strong>Dirección laboral:</strong>{" "}
+                {user.direccionLaboral || "–"}
+              </p>
             </div>
           </div>
         </div>

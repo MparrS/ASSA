@@ -1,214 +1,140 @@
-import { DriveFolderUploadOutlined } from "@mui/icons-material";
-import React from "react";
-import { useContext } from "react";
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import Navbar from "../../components/navbar/Navbar";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { AuthContext } from "../../context/AuthContext";
-import { v4 as uuid } from "uuid";
-import "./editProfile.scss";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db, storage } from "../../firebase";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updateEmail,
-  updateProfile,
-} from "firebase/auth";
+import { DriveFolderUploadOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import "./editProfile.scss";
 
 const EditProfile = () => {
-  const [img, setImg] = useState(null);
-  const [error, setError] = useState(false);
-  const [data, setData] = useState({
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const [form, setForm] = useState({
     name: "",
-    newEmail: "",
+    username: "",
+    email: "",
     phone: "",
-    age: "",
     country: "",
-    relationship: "",
-    oldPassword: "",
+    direccionLaboral: "",
+    existingProfilePicture: ""
   });
-  const { currentUser } = useContext(AuthContext);
+  const [file, setFile] = useState(null);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  // carga datos actuales
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    fetch(`http://localhost:3001/api/users/${currentUser.id}`)
+      .then(r => r.json())
+      .then(u => {
+        setForm({
+          name: u.name || "",
+          username: u.username || "",
+          email: u.email || "",
+          phone: u.phone || "",
+          country: u.country || "",
+          direccionLaboral: u.direccionLaboral || "",
+          existingProfilePicture: u.profilePicture || ""
+        });
+      })
+      .catch(console.error);
+  }, [currentUser]);
 
-  const handleUpdate = async (e) => {
+  const handleChange = e =>
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleSubmit = async e => {
     e.preventDefault();
+    const fd = new FormData();
+    fd.append("name", form.name);
+    fd.append("username", form.username);
+    fd.append("email", form.email);
+    fd.append("phone", form.phone);
+    fd.append("country", form.country);
+    fd.append("direccionLaboral", form.direccionLaboral);
+    fd.append("existingProfilePicture", form.existingProfilePicture);
+    if (file) fd.append("profilePicture", file);
 
-    if (img) {
-      const storageRef = ref(storage, "usersImages/" + uuid());
-      const uploadTask = uploadBytesResumable(storageRef, img);
-
-      uploadTask.on(
-        (error) => {
-          setError(true);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateProfile(currentUser, {
-              displayName: data.name,
-              email: data.newEmail,
-              photoURL: downloadURL,
-            });
-
-            await setDoc(doc(db, "users", currentUser.uid), {
-              uid: currentUser.uid,
-              photoURL: downloadURL,
-              displayName: data.name,
-              email: data.newEmail,
-              phone: data.phone,
-              age: data.age,
-              country: data.country,
-              relationship: data.relationship,
-              createdAt: serverTimestamp(),
-            });
-
-            const credential = EmailAuthProvider.credential(
-              currentUser.email,
-              data.oldPassword
-            );
-
-            await reauthenticateWithCredential(currentUser, credential).then(
-              async () => {
-                //User reauthenticate
-                await updateEmail(currentUser, data.newEmail);
-              }
-            );
-          });
-        }
+    try {
+      const res = await fetch(
+        `http://localhost:3001/api/users/${currentUser.id}`,
+        { method: "PUT", body: fd }
       );
-    } else {
-      await updateProfile(currentUser, {
-        displayName: data.name,
-        email: data.newEmail,
-      });
-
-      await setDoc(doc(db, "users", currentUser.uid), {
-        uid: currentUser.uid,
-
-        displayName: data.name,
-        email: data.newEmail,
-        phone: data.phone,
-        age: data.age,
-        country: data.country,
-        relationship: data.relationship,
-        createdAt: serverTimestamp(),
-      });
-
-      const credential = EmailAuthProvider.credential(
-        currentUser.email,
-        data.oldPassword
-      );
-
-      await reauthenticateWithCredential(currentUser, credential).then(
-        async () => {
-          //User reauthenticate
-          await updateEmail(currentUser, data.newEmail);
-        }
-      );
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Error actualizando perfil");
+      setCurrentUser(c => ({ ...c, ...body }));
+      navigate(`/profile/${body.username}`);
+    } catch (err) {
+      alert(err.message);
+      console.error("Frontend PUT error:", err);
     }
-    navigate("/login");
   };
-  // console.log(data);
+
   return (
     <div className="editProfile">
       <Navbar />
       <div className="editProfileWrapper">
         <Sidebar />
         <div className="profileRight">
-          <div className="profileRightTop">
-            <div className="profileCover">
-              <img
-                src="/assets/profileCover/profilecover.jpg"
-                alt=""
-                className="profileCoverImg"
-              />
-              <img
-                src={currentUser.photoURL}
-                alt=""
-                className="profileUserImg"
-              />
-            </div>
-            <div className="profileInfo">
-              <h4 className="profileInfoName">{currentUser.displayName}</h4>
-              <span className="profileInfoDesc">Hi Friends!</span>
-            </div>
+          <div className="profileCover">
+            <img
+              className="profileCoverImg"
+              src="/assets/profileCover/profilecover.jpg"
+              alt=""
+            />
+            <img
+              className="profileUserImg"
+              src={
+                file
+                  ? URL.createObjectURL(file)
+                  : form.existingProfilePicture ||
+                    "/assets/profileCover/DefaultProfile.jpg"
+              }
+              alt=""
+            />
           </div>
+
           <div className="editprofileRightBottom">
             <div className="top">
-              <h1>Edit User Profile</h1>
+              <h1>Edit Profile</h1>
             </div>
             <div className="bottom">
-              <div className="left">
-                <img
-                  src={
-                    img
-                      ? URL.createObjectURL(img)
-                      : "/assets/profileCover/DefaultProfile.jpg"
-                  }
-                  alt=""
-                />
-              </div>
+              <div className="left" />
               <div className="right">
-                <form onSubmit={handleUpdate}>
+                <form onSubmit={handleSubmit}>
                   <div className="formInput">
                     <label htmlFor="file">
-                      Image: <DriveFolderUploadOutlined className="icon" />
+                      Photo: <DriveFolderUploadOutlined className="icon" />
                     </label>
                     <input
                       type="file"
                       id="file"
                       style={{ display: "none" }}
-                      onChange={(e) => setImg(e.target.files[0])}
-                    />
-                  </div>
-                  <div className="formInput">
-                    <label>Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Jane Doe"
-                      onChange={handleChange}
+                      accept="image/*"
+                      onChange={e => setFile(e.target.files[0])}
                     />
                   </div>
 
-                 
-                  <div className="formInput">
-                    <label>Phone</label>
-                    <input
-                      type="text"
-                      name="phone"
-                      placeholder="+4 123 456 789"
-                      onChange={handleChange}
-                    />
-                  </div>
-                 
-                  <div className="formInput">
-                    <label>Country</label>
-                    <input
-                      type="text"
-                      name="country"
-                      placeholder="United Kingdom"
-                      onChange={handleChange}
-                    />
-                  </div>
-                  
-                  <div className="formInput">
-                    <label>Password</label>
-                    <input
-                      type="password"
-                      name="oldPassword"
-                      placeholder="Enter Your Old Password"
-                      onChange={handleChange}
-                    />
-                  </div>
+                  {[
+                    { label: "Name", name: "name", type: "text" },
+                    { label: "Username", name: "username", type: "text" },
+                    { label: "Email", name: "email", type: "email" },
+                    { label: "Phone", name: "phone", type: "text" },
+                    { label: "Country", name: "country", type: "text" },
+                    { label: "Dirección Laboral", name: "direccionLaboral", type: "text" }
+                  ].map(field => (
+                    <div className="formInput" key={field.name}>
+                      <label>{field.label}</label>
+                      <input
+                        type={field.type}
+                        name={field.name}
+                        value={form[field.name]}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  ))}
+
                   <button type="submit" className="updateButton">
-                    Update Profile
+                    Guardar cambios
                   </button>
                 </form>
               </div>

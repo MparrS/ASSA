@@ -1,8 +1,30 @@
 .profileRightBar {
   padding: 20px;
-  background-color: #fff;
+  background: #fff;
+  color: #333;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  &.dark {
+    background: #1e1e1e;
+    color: #ddd;
+    .profileRightBarTitle,
+    .userName,
+    .userRole,
+    .userDetails p {
+      color: #ccc;
+    }
+    .userInfoCard {
+      background: #2a2a2a;
+      border-color: #444;
+    }
+    .actionButtons .editButton {
+      background: #1976d2;
+    }
+    .actionButtons .adminButton {
+      background: #c62828;
+    }
+  }
 
   .profileRightBarHeading {
     display: flex;
@@ -13,105 +35,109 @@
     .profileRightBarTitle {
       font-size: 1.2rem;
       font-weight: 600;
-      color: #333;
     }
 
     .actionButtons {
       display: flex;
       gap: 10px;
 
-      a {
-        text-decoration: none;
-      }
-
       .editButton,
       .adminButton {
         padding: 6px 12px;
+        border: none;
         border-radius: 5px;
         font-size: 0.9rem;
         font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
-      .editButton {
-        background-color: #2e9afe;
         color: #fff;
+        text-decoration: none;
+        transition: background 0.3s;
+      }
+      .editButton {
+        background: #2e9afe;
         &:hover {
-          background-color: #1c7ed6;
+          background: #1c7ed6;
         }
       }
-
       .adminButton {
-        background-color: #ff5a5f;
-        color: #fff;
+        background: #ff5a5f;
         &:hover {
-          background-color: #e03e3e;
+          background: #e03e3e;
         }
       }
     }
   }
 
-  /* Tarjeta moderna de información del usuario */
   .userInfoCard {
     border: 1px solid #ddd;
     border-radius: 10px;
-    background-color: #fafafa;
+    background: #fafafa;
     padding: 20px;
-  }
 
-  /* Diseño en dos columnas: imagen a la izquierda y datos a la derecha */
-  .userInfoRow {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-  }
-
-  .userImageContainer {
-    flex: 0 0 auto;
-  }
-
-  .userImage {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-  }
-
-  .userTextInfo {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    .userInfoHeader {
+    .userInfoRow {
       display: flex;
-      justify-content: space-between;
+      gap: 20px;
       align-items: center;
+    }
 
-      .userName {
-        font-size: 1.6rem;
-        font-weight: bold;
-        color: #333;
-      }
-      .userRole {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #888;
+    .userImageContainer {
+      flex-shrink: 0;
+      .userImage {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1px solid #ccc;
       }
     }
 
-    .userDetails {
-      p {
-        font-size: 1rem;
-        margin: 5px 0;
-        color: #555;
+    .userTextInfo {
+      flex: 1;
 
-        strong {
-          color: #333;
+      .userInfoHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+
+        .userName {
+          font-size: 1.4rem;
+          font-weight: 600;
+        }
+        .userRole {
+          font-size: 0.9rem;
+          color: #666;
         }
       }
+
+      .userDetails {
+        p {
+          margin: 4px 0;
+          font-size: 0.9rem;
+          strong {
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .profileRightBar {
+    padding: 16px;
+    .userInfoRow {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .userImageContainer .userImage {
+      width: 80px;
+      height: 80px;
+    }
+    .userInfoHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
     }
   }
 }

@@ -62,11 +62,11 @@ const Navbar = ({ setView }) => {
       <div className="navbarRight">
         {userToDisplay && (
           <Link to={`/profile/${userToDisplay.username}`}>
-            <img
-              src={userToDisplay.profilePicture}
-              alt={userToDisplay.name || "user"}
-              className="navbarImg"
-            />
+          <img
+            src={userToDisplay.profilePicture || "/assets/profileCover/DefaultProfile.jpg"}
+            alt={userToDisplay.name || "user"}
+            className="navbarImg"
+          />
           </Link>
         )}
 

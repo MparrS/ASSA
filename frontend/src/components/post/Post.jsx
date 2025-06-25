@@ -1,282 +1,247 @@
-import React, { useState, useContext, useEffect } from "react";
-import "./post.scss";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import {
+  FavoriteBorder,
+  Favorite,
+  ChatBubbleOutline,
+  MoreVert
+} from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
+import "./post.scss";
 
-// Funciones auxiliares para parsear fecha (como las tienes)
-const parsePostDate = (dateString) => {
-  const parts = dateString.split(",");
-  if (parts.length < 2) {
-    return new Date(dateString);
-  }
-  const datePart = parts[0].trim();
-  let timePart = parts[1].trim();
-  timePart = timePart
-    .replace("p. m.", "PM")
-    .replace("a. m.", "AM")
-    .replace("P.M.", "PM")
-    .replace("A.M.", "AM");
-  const dateParts = datePart.split("/");
-  if (dateParts.length !== 3) {
-    return new Date(dateString);
-  }
-  const day = parseInt(dateParts[0], 10);
-  const month = parseInt(dateParts[1], 10) - 1;
-  const year = parseInt(dateParts[2], 10);
-  const timeRegex = /(\d+):(\d+):(\d+)\s*(AM|PM)/i;
-  const match = timePart.match(timeRegex);
-  if (!match) {
-    return new Date(dateString);
-  }
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const seconds = parseInt(match[3], 10);
-  const ampm = match[4].toUpperCase();
-  if (ampm === "PM" && hours < 12) hours += 12;
-  if (ampm === "AM" && hours === 12) hours = 0;
-  return new Date(year, month, day, hours, minutes, seconds);
+const parseDate = ds => {
+  const d = new Date(ds);
+  return isNaN(d) ? new Date() : d;
 };
-
-const getRelativeTime = (postDate) => {
-  const now = new Date();
-  const diff = now - postDate;
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days > 0) {
-    return `hace ${days} día${days !== 1 ? "s" : ""}`;
-  } else if (hours > 0) {
-    return `hace ${hours} hora${hours !== 1 ? "s" : ""}`;
-  } else if (minutes > 0) {
-    return `hace ${minutes} minuto${minutes !== 1 ? "s" : ""}`;
-  } else {
-    return `hace ${seconds} segundo${seconds !== 1 ? "s" : ""}`;
-  }
+const getRelativeTime = d => {
+  const diff = Date.now() - d.getTime();
+  const sec = Math.floor(diff/1000),
+        min = Math.floor(diff/60000),
+        hrs = Math.floor(diff/3600000),
+        days = Math.floor(diff/86400000);
+  if (days>0) return `hace ${days} día${days>1?'s':''}`;
+  if (hrs>0)  return `hace ${hrs} hora${hrs>1?'s':''}`;
+  if (min>0)  return `hace ${min} minuto${min>1?'s':''}`;
+  return `hace ${sec} segundo${sec>1?'s':''}`;
 };
+const isVideo = url => ["mp4","webm","mov","avi","mkv"]
+  .includes(url.split(".").pop().toLowerCase());
 
 const Post = ({ post }) => {
   const { currentUser } = useContext(AuthContext);
+  const isAdmin = currentUser?.rol === "admin";
 
-  // Datos del autor y del post
-  const userName = post.userName || "Sin nombre";
-  const userProfilePicture = post.userProfilePicture || "/assets/profileCover/DefaultProfile.jpg";
-  const postTitle = post.title || "";
-  const postBody = post.body || "";
-  const images = post.post_images || [];
-  const [currentImage, setCurrentImage] = useState(0);
+  const mediaList = post.media?.map(m=>m.url) || post.post_images || [];
+  const [idx, setIdx] = useState(0);
+  const prev = () => setIdx(i=>i===0?mediaList.length-1:i-1);
+  const next = () => setIdx(i=>i===mediaList.length-1?0:i+1);
 
-  // Likes
-  const [isLiked, setIsLiked] = useState(post.isLiked || false);
-  const [likeCount, setLikeCount] = useState(post.likes || 0);
-
-  // Comentarios
-  const [showComments, setShowComments] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState(post.comments || []);
-  const [loadingComment, setLoadingComment] = useState(false);
-
-  let relativeTimeText = "";
-  if (post.date) {
-    const pDate = parsePostDate(post.date);
-    if (!isNaN(pDate.getTime())) {
-      relativeTimeText = getRelativeTime(pDate);
-    } else {
-      relativeTimeText = post.date;
-    }
-  }
-
-  // Carrusel de imágenes
-  const handlePrevImage = () => {
-    setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNextImage = () => {
-    setCurrentImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
-
-  // Actualizar "like" en el backend
-  const handleLikeAction = async () => {
-    if (!currentUser) return;
-    try {
-      if (isLiked) {
-        const res = await fetch(`http://localhost:3001/api/posts/${post.id}/unlike`, {
-          method: "POST",
-        });
-        if (res.ok) {
-          setIsLiked(false);
-          setLikeCount((prev) => prev - 1);
-        }
-      } else {
-        const res = await fetch(`http://localhost:3001/api/posts/${post.id}/like`, {
-          method: "POST",
-        });
-        if (res.ok) {
-          setIsLiked(true);
-          setLikeCount((prev) => prev + 1);
-        }
-      }
-    } catch (error) {
-      console.error("Error al actualizar like:", error);
-    }
-  };
-
-  // Obtener comentarios desde el backend
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`/api/comments?postId=${post.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setComments(data.comments);
-      } else {
-        console.error("Error al obtener comentarios");
-      }
-    } catch (error) {
-      console.error("Error en la conexión:", error);
-    }
-  };
-
+  // likes
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(post.likes);
   useEffect(() => {
-    fetchComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.id]);
+    if (!currentUser) return;
+    fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3001"}/api/posts/${post.id}/isLiked?uid=${currentUser.id}`)
+      .then(r=>r.json())
+      .then(d=>setIsLiked(d.isLiked))
+      .catch(console.error);
+  }, [post.id, currentUser]);
 
-  // Publicar comentario sin actualizar el estado local
-  const publishComment = async (newComment) => {
-    setLoadingComment(true);
-    try {
-      const response = await fetch("http://localhost:3001/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newComment),
-      });
-      if (!response.ok) {
-        console.error("Error al publicar el comentario");
-      } else {
-        const data = await response.json();
-        console.log("Comentario publicado con ID:", data.commentId);
+  const toggleLike = async () => {
+    if (!currentUser) return;
+    const action = isLiked?"unlike":"like";
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL || "http://localhost:3001"}/api/posts/${post.id}/${action}`,
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ uid: currentUser.id })
       }
-    } catch (error) {
-      console.error("Error en la conexión:", error);
+    );
+    if (res.ok) {
+      const { likes: cnt } = await res.json();
+      setLikes(cnt);
+      setIsLiked(!isLiked);
     }
-    // Luego de un retardo descarga la página para actualizar
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
   };
 
-  // Al publicar un comentario, no lo agregamos al estado local; se visualizará justo después de la recarga
-  const handlePublishComment = () => {
-    if (commentText.trim() && currentUser) {
-      const newComment = {
+  // comentarios
+  const [showC, setShowC] = useState(false);
+  const [comments, setComments] = useState(post.comments);
+  const [newC, setNewC] = useState("");
+  const [loading, setLoading] = useState(false);
+  const fetchComments = async () => {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL || "http://localhost:3001"}/api/comments?postId=${post.id}`
+    );
+    if (res.ok) {
+      const { comments } = await res.json();
+      setComments(comments);
+    }
+  };
+  useEffect(() => {
+    if (showC) fetchComments();
+  }, [showC]);
+
+  const publishComment = async () => {
+    if (!newC.trim()||!currentUser) return;
+    setLoading(true);
+    await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3001"}/api/comments`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
         postId: post.id,
         userId: currentUser.id,
-        body: commentText,
+        body: newC,
         date: new Date().toLocaleString(),
-        likes: 0,
-        username: currentUser.username,
-        profilePicture: currentUser.profilePicture,
-      };
-      setCommentText("");
-      publishComment(newComment);
-    } else {
-      console.error("No se encontró el usuario o el comentario está vacío");
-    }
+        likes: 0
+      })
+    });
+    setNewC("");
+    await fetchComments();
+    setLoading(false);
   };
+
+  // menú admin
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef();
+
+  useEffect(() => {
+    const handler = e => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleDelete = async () => {
+    if (!window.confirm("¿Eliminar esta publicación?")) return;
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL || "http://localhost:3001"}/api/posts/${post.id}`,
+      { method: "DELETE" }
+    );
+    if (res.ok) window.location.reload();
+    else alert("Error al eliminar");
+  };
+
+  const date = getRelativeTime(parseDate(post.date));
 
   return (
     <div className="post">
       <div className="postWrapper">
+
+        {/* header */}
         <div className="post-header">
-          <img className="profile-img" src={userProfilePicture} alt={userName} />
+          <img className="profile-img"
+               src={post.userProfilePicture}
+               alt={post.userName}/>
           <div className="author-info">
-            <span className="name">{userName}</span>
+            <span className="name">{post.userName}</span>
+            <span className="post-date">{date}</span>
           </div>
+          {isAdmin && (
+            <div className="admin-menu" ref={menuRef}>
+              <MoreVert
+                className="more-icon"
+                onClick={()=>setMenuOpen(o=>!o)}
+              />
+              {menuOpen && (
+                <div className="menu-dropdown">
+                  <div
+                    className="menu-item delete"
+                    onClick={handleDelete}
+                  >
+                    Eliminar publicación
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
+        {/* contenido */}
         <div className="post-content">
-          {postTitle && <h2 className="title">{postTitle}</h2>}
-          {post.date && <p className="post-date">{relativeTimeText}</p>}
-          {postBody && <p className="body">{postBody}</p>}
-
-          {images.length > 0 && (
+          {post.title && <h2 className="title">{post.title}</h2>}
+          {post.body && <p className="body">{post.body}</p>}
+          {mediaList.length>0 && (
             <div className="post-images">
-              {images.length > 1 && (
+              {mediaList.length>1 && (
                 <>
-                  <button className="nav prev" onClick={handlePrevImage}>
-                    &lt;
-                  </button>
-                  <button className="nav next" onClick={handleNextImage}>
-                    &gt;
-                  </button>
+                  <button className="nav prev" onClick={prev}>&lt;</button>
+                  <button className="nav next" onClick={next}>&gt;</button>
                 </>
               )}
-              <img
-                className="carousel-img"
-                src={images[currentImage]}
-                alt={`Imagen ${currentImage + 1}`}
-              />
+              {isVideo(mediaList[idx]) ? (
+                <video
+                  key={idx}
+                  className="carousel-img"
+                  src={mediaList[idx]}
+                  controls
+                />
+              ) : (
+                <img
+                  key={idx}
+                  className="carousel-img"
+                  src={mediaList[idx]}
+                  alt={`media-${idx}`}
+                />
+              )}
               <div className="image-counter">
-                {currentImage + 1} / {images.length}
+                {idx+1} / {mediaList.length}
               </div>
             </div>
           )}
         </div>
 
+        {/* footer */}
         <div className="post-footer">
           <div className="actions">
-            <div className="action" onClick={handleLikeAction}>
-              <span role="img" aria-label="like">
-                👍
-              </span>{" "}
-              Me gusta
+            <div className="action" onClick={toggleLike}>
+              {isLiked
+                ? <Favorite htmlColor="red"/>
+                : <FavoriteBorder/> } Me gusta
             </div>
-            <div
-              className="action"
-              onClick={() => setShowComments(!showComments)}
-            >
-              <span role="img" aria-label="comment">
-                💬
-              </span>{" "}
-              Comentario
+            <div className="action"
+                 onClick={()=>setShowC(v=>!v)}>
+              <ChatBubbleOutline/> Comentarios
             </div>
           </div>
           <div className="details">
-            {likeCount} me gusta · {comments.length} comentarios
+            {likes} me gusta · {comments.length} comentarios
           </div>
         </div>
 
-        {showComments && (
+        {showC && (
           <div className="comments-section">
-            {loadingComment && (
+            {loading && (
               <div className="comment-loading">
-                <CircularProgress size={30} />
+                <CircularProgress size={24}/>
               </div>
             )}
             <div className="comment-input-row">
               <input
                 className="comment-input"
-                type="text"
+                value={newC}
+                onChange={e=>setNewC(e.target.value)}
                 placeholder="Escribe un comentario..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
               />
-              <button className="comment-button" onClick={handlePublishComment}>
-                Publicar
-              </button>
+              <button
+                className="comment-button"
+                onClick={publishComment}
+              >Publicar</button>
             </div>
             <div className="comment-list">
-              {comments.map((comment, index) => (
-                <div className="comment" key={index}>
-                  <img
-                    className="comment-profile"
-                    src={comment.profilePicture || "/ruta/default.jpg"}
-                    alt={comment.username}
-                  />
+              {comments.map(c=>(
+                <div className="comment" key={c.id}>
+                  <img className="comment-profile"
+                       src={c.profilePicture}
+                       alt={c.username}/>
                   <div className="comment-data">
-                    <p className="comment-body">{comment.body}</p>
-                    <span className="comment-username">@{comment.username}</span>
-                    <div className="comment-date">{comment.date}</div>
+                    <p className="comment-body">{c.body}</p>
+                    <span className="comment-username">@{c.username}</span>
+                    <span className="comment-date">{c.date}</span>
                   </div>
                 </div>
               ))}
