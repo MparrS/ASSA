@@ -1,289 +1,381 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import CircularProgress from "@mui/material/CircularProgress";
-import { AuthContext } from "../../context/AuthContext";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate }                          from "react-router-dom";
+import CircularProgress                         from "@mui/material/CircularProgress";
+import { Edit, Delete, LockReset, Lock, Search, Close } from "@mui/icons-material";
+import { AuthContext }                          from "../../context/AuthContext";
 import "./adminPanel.scss";
+
+const API = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
   const { currentUser, logout } = useContext(AuthContext);
-  const [users, setUsers] = useState([]); // Lista de usuarios
-  const [loading, setLoading] = useState(true);
-  const [editingUserId, setEditingUserId] = useState(null);
-  const [formData, setFormData] = useState({});
 
-  // Obtiene la lista completa de usuarios
+  const [view, setView]             = useState("dashboard");
+  const [loading, setLoading]       = useState(true);
+  const [users, setUsers]           = useState([]);
+  const [spaces, setSpaces]         = useState([]);
+  const [editingUserId, setEditId]  = useState(null);
+  const [formData, setFormData]     = useState({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newUser, setNewUser]       = useState({
+    name: "", username: "", documento: "", email: "",
+    phone: "", country: "", rol: "empleado", points: 0,
+    direccionLaboral: ""
+  });
+  const [showPwdModal, setShowPwdModal] = useState(false);
+  const [pwdUserId, setPwdUserId]   = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [createError, setCreateError] = useState("");
+
+  const fetchUsers = async () => {
+    const res = await fetch(`${API}/api/users`);
+    if (res.ok) setUsers(await res.json());
+  };
+
   useEffect(() => {
-    const fetchAllUsers = async () => {
+    (async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/users");
-        if (!res.ok) {
-          throw new Error("Error al obtener la lista de usuarios");
-        }
-        const data = await res.json();
-        console.log("Lista de usuarios:", data);
-        setUsers(data);
+        await fetchUsers();
+        const sRes  = await fetch(`${API}/api/spaces`);
+        const sJson = await sRes.json();
+        setSpaces(sJson.spaces || []);
       } catch (err) {
-        console.error("Error fetching users:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchAllUsers();
+    })();
   }, []);
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   const handleLogout = () => {
-    if (logout) {
-      logout();
-    } else {
-      localStorage.removeItem("token");
-    }
+    logout?.() ?? localStorage.removeItem("token");
     navigate("/login");
   };
 
-  // Inicia la edición de un usuario
-  const handleEditClick = (user) => {
-    setEditingUserId(user.id);
-    setFormData(user);
+  const handleEditClick = u => {
+    setEditId(u.id);
+    setFormData({ ...u });
   };
-
   const handleCancelEdit = () => {
-    setEditingUserId(null);
+    setEditId(null);
     setFormData({});
   };
-
-  // Maneja cambios en los inputs del formulario
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(f => ({ ...f, [name]: value }));
   };
-
-  // Envía la actualización al backend mediante PUT
   const handleSaveEdit = async () => {
-    try {
-      const res = await fetch(`http://localhost:3001/api/users/${editingUserId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) {
-        throw new Error("Error actualizando el usuario");
-      }
-      const updatedUser = await res.json();
-      // Actualiza la lista local de usuarios
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === editingUserId ? updatedUser : user))
-      );
-      setEditingUserId(null);
-      setFormData({});
-    } catch (err) {
-      console.error("Error saving edit:", err);
+    const res = await fetch(`${API}/api/users/${editingUserId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setUsers(u => u.map(x => x.id === updated.id ? updated : x));
+      handleCancelEdit();
+      alert("Usuario actualizado");
+    }
+  };
+  const handleDeleteUser = async id => {
+    if (!window.confirm("¿Eliminar usuario?")) return;
+    await fetch(`${API}/api/users/${id}`, { method: "DELETE" });
+    setUsers(u => u.filter(x => x.id !== id));
+  };
+
+  const handleNewUserChange = e => {
+    const { name, value } = e.target;
+    setNewUser(n => ({ ...n, [name]: value }));
+  };
+  const handleCreateUser = async () => {
+    setCreateError("");                
+    const res = await fetch(`${API}/api/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser)
+    });
+    const body = await res.json();
+    if (res.ok) {
+      setUsers(u => [...u, body]);
+      setShowCreateModal(false);
+      alert("Usuario creado");
+    } else {
+      // aquí mostramos POR QUÉ falló
+      setCreateError(body.error || "Error desconocido al crear usuario");
     }
   };
 
-  // Función para eliminar un usuario (requiere la implementación del endpoint DELETE en backend)
-  const handleDelete = async (userId) => {
-    if (window.confirm("¿Estás seguro de eliminar este usuario?")) {
-      try {
-        const res = await fetch(`http://localhost:3001/api/users/${userId}`, {
-          method: "DELETE",
-        });
-        if (!res.ok) {
-          throw new Error("Error eliminando el usuario");
-        }
-        // Actualiza la lista local filtrando el usuario eliminado
-        setUsers((prev) => prev.filter((user) => user.id !== userId));
-      } catch (err) {
-        console.error("Error deleting user:", err);
-        alert("Error eliminando el usuario");
-      }
+  const resetPassword = async id => {
+    if (!window.confirm("¿Resetear al documento?")) return;
+    const res = await fetch(`${API}/api/users/${id}/reset-password`, { method: "POST" });
+    if (res.ok) {
+      alert("🔑 Contraseña reseteada");
+      await fetchUsers();
+    } else {
+      alert("Error al resetear");
     }
   };
 
-  const userName = currentUser?.displayName || "Usuario";
+  const openPwdModal = id => {
+    setPwdUserId(id);
+    setNewPassword("");
+    setShowPwdModal(true);
+  };
+  const changePassword = async () => {
+    if (newPassword.length < 4) {
+      alert("La contraseña debe tener mínimo 4 caracteres");
+      return;
+    }
+    const res = await fetch(`${API}/api/users/${pwdUserId}/password`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newPassword })
+    });
+    if (res.ok) {
+      alert("🔒 Contraseña actualizada");
+      setShowPwdModal(false);
+      await fetchUsers();
+    } else {
+      alert("Error al cambiar contraseña");
+    }
+  };
+
+  const handleDeleteSpace = async id => {
+    if (!window.confirm("¿Eliminar espacio?")) return;
+    await fetch(`${API}/api/spaces/${id}`, { method: "DELETE" });
+    setSpaces(s => s.filter(x => x.id !== id));
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-container">
+        <div className="loading"><CircularProgress size={40} /></div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">
       <aside className="admin-sidebar">
-        <h2 className="admin-title">Admin Panel</h2>
-        <nav className="admin-menu">
-          <a href="#">Inicio</a>
-          <details>
-            <summary>Personas</summary>
-          </details>
-          <a href="#">Administrar Espacios</a>
-          <a href="#">Administrar Yalepuntos</a>
-          <a href="#">Administrar Premios</a>
-          <a href="#">Administrar Redenciones</a>
-          <a href="#">Administrar Accesos Directos</a>
+        <h2>Admin Panel</h2>
+        <nav>
+          <button className={view==="dashboard"?"active":""} onClick={()=>setView("dashboard")}>Inicio</button>
+          <button className={view==="users"    ?"active":""} onClick={()=>setView("users")   }>Usuarios</button>
+          <button className={view==="spaces"   ?"active":""} onClick={()=>setView("spaces")  }>Espacios</button>
         </nav>
       </aside>
 
-      <main className="admin-main">
-        <div className="admin-buttons">
-          <button onClick={handleGoBack}>Volver</button>
-          <button onClick={handleLogout}>Cerrar Sesi&oacute;n</button>
-        </div>
+      <div className="contentWrapper">
+        <header className="admin-buttons">
+          <button onClick={()=>navigate(-1)}>Volver</button>
+          <button onClick={handleLogout}>Cerrar Sesión</button>
+        </header>
 
-        {loading ? (
-          <div className="admin-loading">
-            <CircularProgress size={40} />
-          </div>
-        ) : (
-          <>
-            <div className="admin-card">
-              <p><strong>Bienvenido, {userName}</strong></p>
-              <p>Rol: {currentUser?.rol?.toUpperCase() || "N/A"}</p>
-            </div>
+        <section className="admin-card">
+          <p><strong>Hola, {currentUser.username}</strong></p>
+          <p>Rol: {currentUser.rol.toUpperCase()}</p>
+        </section>
 
-            <div className="admin-card">
-              <h3>Usuarios</h3>
-              <table className="usersTable">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Username</th>
-                    <th>Documento</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Rol</th>
-                    <th>Points</th>
-                    <th>Direcci&oacute;n</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.id}</td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="text"
-                            name="name"
-                            value={formData.name || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.name
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="text"
-                            name="username"
-                            value={formData.username || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.username
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="text"
-                            name="documento"
-                            value={formData.documento || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.documento
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="email"
-                            name="email"
-                            value={formData.email || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.email
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="text"
-                            name="phone"
-                            value={formData.phone || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.phone
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <select
-                            name="rol"
-                            value={formData.rol || ""}
-                            onChange={handleInputChange}
-                          >
-                            <option value="admin">Admin</option>
-                            <option value="empleado">Empleado</option>
-                          </select>
-                        ) : (
-                          user.rol
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="number"
-                            name="points"
-                            value={formData.points || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.points
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <input
-                            type="text"
-                            name="direccionLaboral"
-                            value={formData.direccionLaboral || ""}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          user.direccionLaboral || "N/A"
-                        )}
-                      </td>
-                      <td>
-                        {editingUserId === user.id ? (
-                          <>
-                            <button className="saveButton" onClick={handleSaveEdit}>Guardar</button>
-                            <button className="cancelButton" onClick={handleCancelEdit}>Cancelar</button>
-                          </>
-                        ) : (
-                          <>
-                            <button className="editButton" onClick={() => handleEditClick(user)}>Editar</button>
-                            <button className="deleteButton" onClick={() => handleDelete(user.id)}>Eliminar</button>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+        {view==="dashboard" && (
+          <section className="admin-card metrics">
+            <div><h4>Total Usuarios</h4><p>{users.length}</p></div>
+            <div><h4>Total Espacios</h4><p>{spaces.length}</p></div>
+          </section>
         )}
-      </main>
+
+        {view==="users" && (
+          <section className="admin-card">
+            <div className="users-header">
+              <h3>Usuarios</h3>
+            <button className="createUserBtn" onClick={()=>{
+              setCreateError("");
+              setShowCreateModal(true);
+            }}>
+              + Nuevo Usuario
+            </button>
+            </div>
+            <div className="usersSearch">
+              <Search className="searchIcon" />
+              <input
+                type="text"
+                value={searchTerm}
+                placeholder="Busqueda por documento, nombre y username"
+                onChange={e => setSearchTerm(e.target.value.toLowerCase())}
+              />
+              {searchTerm && (
+                <Close
+                  className="clearIcon"
+                  onClick={() => setSearchTerm("")}
+                />
+              )}
+            </div>
+            <table className="usersTable">
+              <thead>
+                <tr>
+                  <th>Nombre</th><th>Username</th><th>Documento</th>
+                  <th>Email</th><th>Phone</th><th>Rol</th><th>Points</th>
+                  <th>Dirección</th><th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users
+                  .filter(u =>
+                    u.name?.toLowerCase().includes(searchTerm) ||
+                    u.username?.toLowerCase().includes(searchTerm) ||
+                    u.documento?.toString().includes(searchTerm)
+                  )
+                  .map(u => (
+                  <tr key={u.id}>
+                    <td>{editingUserId===u.id
+                      ? <input name="name" value={formData.name} onChange={handleInputChange}/>
+                      : u.name}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <input name="username" value={formData.username} onChange={handleInputChange}/>
+                      : u.username}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <input name="documento" value={formData.documento} onChange={handleInputChange}/>
+                      : u.documento}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <input name="email" value={formData.email} onChange={handleInputChange}/>
+                      : u.email}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <input name="phone" value={formData.phone} onChange={handleInputChange}/>
+                      : u.phone}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <select name="rol" value={formData.rol} onChange={handleInputChange}>
+                          <option value="admin">Admin</option>
+                          <option value="empleado">Empleado</option>
+                        </select>
+                      : u.rol}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <input name="points" type="number" value={formData.points} onChange={handleInputChange}/>
+                      : u.points}
+                    </td>
+                    <td>{editingUserId===u.id
+                      ? <input name="direccionLaboral" value={formData.direccionLaboral} onChange={handleInputChange}/>
+                      : u.direccionLaboral}
+                    </td>
+                    <td className="actions-cell">
+                      {editingUserId===u.id ? (
+                        <div className="action-group edit-mode">
+                          <button className="saveBtn" onClick={handleSaveEdit}>Guardar</button>
+                          <button className="cancelBtn" onClick={handleCancelEdit}>Cancelar</button>
+                        </div>
+                      ) : (
+                        <div className="action-group normal-mode">
+                          <button className="actionBtn editBtn"      onClick={()=>handleEditClick(u)}><Edit fontSize="small"/></button>
+                          <button className="actionBtn deleteBtn"    onClick={()=>handleDeleteUser(u.id)}><Delete fontSize="small"/></button>
+                          <button className="actionBtn resetBtn"     onClick={()=>resetPassword(u.id)}><LockReset fontSize="small"/></button>
+                          <button className="actionBtn changePwdBtn" onClick={()=>openPwdModal(u.id)}><Lock fontSize="small"/></button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+
+        {view==="spaces" && (
+          <section className="admin-card">
+            <h3>Espacios</h3>
+            <table className="usersTable">
+              <thead><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr></thead>
+              <tbody>
+                {spaces.map(s => (
+                  <tr key={s.id}>
+                    <td>{s.id}</td><td>{s.name}</td>
+                    <td className="actions-cell">
+                      <button className="actionBtn deleteBtn" onClick={()=>handleDeleteSpace(s.id)}>
+                        <Delete fontSize="small"/>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+
+        {showCreateModal && (
+          <div className="modalOverlay">
+            <div className="modalContent">
+              <h3>Crear Usuario</h3>
+
+              {createError && (
+                <p className="errorMessage">{createError}</p>
+              )}
+
+              <div className="modalForm">
+                {Object.entries(newUser).map(([k, v]) => (
+                  <div className="modalField" key={k}>
+                    <label>{k}</label>
+                    {k === "rol" ? (
+                      <select name={k} value={v} onChange={handleNewUserChange}>
+                        <option value="admin">Admin</option>
+                        <option value="empleado">Empleado</option>
+                      </select>
+                    ) : (
+                      <input
+                        name={k}
+                        value={v}
+                        onChange={handleNewUserChange}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="modalActions">
+                <button className="saveBtn" onClick={handleCreateUser}>
+                  Crear
+                </button>
+                <button
+                  className="cancelBtn"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setCreateError("");
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showPwdModal && (
+          <div className="modalOverlay">
+            <div className="modalContent">
+              <h3>Cambiar Contraseña</h3>
+              <div className="modalForm">
+                <div className="modalField">
+                  <label>Nueva contraseña</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={e=>setNewPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="modalActions">
+                <button className="saveBtn" onClick={changePassword}>Guardar</button>
+                <button className="cancelBtn" onClick={()=>setShowPwdModal(false)}>Cancelar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }

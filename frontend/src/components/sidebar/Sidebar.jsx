@@ -108,16 +108,7 @@ const Sidebar = () => {
         </Link>
 
         {/* Resto de links estáticos */}
-        <MenuLink Icon={<SchoolIcon />}           text="Capacitacion" />
-        <MenuLink Icon={<CampaignIcon />}         text="Noticias y Anuncios" />
-        <MenuLink Icon={<InsertEmoticonIcon />}   text="Work and Life Balance" />
-        <MenuLink Icon={<HistoryEduIcon />}       text="Entrenamientos" />
-        <MenuLink Icon={<SmsIcon />}              text="Comunicaciones" />
-        <MenuLink Icon={<PeopleIcon />}           text="Together We..." />
-        <MenuLink Icon={<MedicationLiquidIcon />} text="Seguridad Salud y Ambiente" />
-        <MenuLink Icon={<RedeemIcon />}           text="Yale Puntos" />
-        <MenuLink Icon={<SummarizeIcon />}        text="Formatos" />
-        <MenuLink Icon={<ShoppingCartIcon />}     text="Descuentos y Promociones" />
+        
 
         <button className="sidebarButton">Show More</button>
         <hr className="sidebarHr" />

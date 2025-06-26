@@ -20,7 +20,6 @@ const EditProfile = () => {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
 
-  // carga datos actuales
   useEffect(() => {
     if (!currentUser?.id) return;
     fetch(`http://localhost:3001/api/users/${currentUser.id}`)
@@ -52,7 +51,12 @@ const EditProfile = () => {
     fd.append("country", form.country);
     fd.append("direccionLaboral", form.direccionLaboral);
     fd.append("existingProfilePicture", form.existingProfilePicture);
-    if (file) fd.append("profilePicture", file);
+    // añadir rol y points para no enviar undefined al servidor
+    fd.append("rol", currentUser.rol || "");
+    fd.append("points", currentUser.points ?? 0);
+    if (file) {
+      fd.append("profilePicture", file);
+    }
 
     try {
       const res = await fetch(
@@ -92,7 +96,6 @@ const EditProfile = () => {
               alt=""
             />
           </div>
-
           <div className="editprofileRightBottom">
             <div className="top">
               <h1>Edit Profile</h1>
@@ -113,7 +116,6 @@ const EditProfile = () => {
                       onChange={e => setFile(e.target.files[0])}
                     />
                   </div>
-
                   {[
                     { label: "Name", name: "name", type: "text" },
                     { label: "Username", name: "username", type: "text" },
@@ -132,7 +134,6 @@ const EditProfile = () => {
                       />
                     </div>
                   ))}
-
                   <button type="submit" className="updateButton">
                     Guardar cambios
                   </button>
