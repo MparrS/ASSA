@@ -1,4 +1,3 @@
-// authController.js
 const util = require('util');
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
@@ -21,33 +20,26 @@ const login = async (req, res) => {
     }
 
     const usuario = results[0];
-
-    // Validar contraseña (texto plano o mediante bcrypt)
     const match = usuario.contrasena === contrasena.toString() ||
       await bcrypt.compare(contrasena.toString(), usuario.contrasena);
 
     if (!match) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
-
-    // Actualizar último login
     await query('UPDATE users SET ultimologin = NOW() WHERE id = ?', [usuario.id]);
 
-    // Crear token JWT
     const token = jwt.sign(
       { id: usuario.id, documento: usuario.documento, rol: usuario.rol },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
-
-    // NOTA: Se asigna displayName usando el valor de la columna "nombre"
     res.json({
       message: 'Login exitoso',
       token,
       usuario: {
         id: usuario.id,
-        displayName: usuario.nombre, // <-- Aquí se asigna
-        profilePicture: usuario.profilePicture, // asegúrate de que exista
+        displayName: usuario.nombre, 
+        profilePicture: usuario.profilePicture,
         rol: usuario.rol,
         puntos: usuario.puntos,
         email: usuario.email,
@@ -65,7 +57,6 @@ const login = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    // Traer la información completa y usar alias para el nombre
     const results = await query(
       'SELECT id, nombre AS displayName, profilePicture, rol, email, phone, country, puntos, ultimologin FROM users WHERE id = ?',
       [userId]

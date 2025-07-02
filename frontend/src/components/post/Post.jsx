@@ -1,4 +1,3 @@
-// frontend/src/components/Post.jsx
 import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import {
@@ -15,10 +14,8 @@ import {
 } from "@mui/material";
 import "./post.scss";
 
-// Ruta de perfil por defecto
 const DEFAULT_PROFILE = "/assets/profileCover/DefaultProfile.jpg";
 
-// Helpers
 const parseDate = ds => {
   const d = new Date(ds);
   return isNaN(d) ? new Date() : d;
@@ -34,7 +31,6 @@ const getRelativeTime = d => {
   if (min>0)  return `hace ${min} minuto${min>1?'s':''}`;
   return `hace ${sec} segundo${sec>1?'s':''}`;
 };
-// isVideo seguro
 const isVideo = url => 
   typeof url === "string" &&
   ["mp4","mov","avi","webm","mkv"]
@@ -43,8 +39,6 @@ const isVideo = url =>
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
   const isAdmin = currentUser?.rol === "admin";
-
-  // 1) Construir mediaList siempre como array de strings
   let mediaList = [];
   if (Array.isArray(post.media)) {
     mediaList = post.media.map(m =>
@@ -59,12 +53,10 @@ export default function Post({ post }) {
     mediaList = post.post_images.filter(u => typeof u === "string");
   }
 
-  // Carousel index
   const [idx, setIdx] = useState(0);
   const prev = () => setIdx(i=> i===0?mediaList.length-1:i-1);
   const next = () => setIdx(i=> i===mediaList.length-1?0:i+1);
 
-  // Likes
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes);
   useEffect(() => {
@@ -96,8 +88,6 @@ export default function Post({ post }) {
       setIsLiked(!isLiked);
     }
   };
-
-  // Comments
   const [showC, setShowC] = useState(false);
   const [comments, setComments] = useState(post.comments || []);
   const [newC, setNewC] = useState("");
@@ -134,8 +124,6 @@ export default function Post({ post }) {
     await fetchComments();
     setLoading(false);
   };
-
-  // Admin menu
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu  = e => setAnchorEl(e.currentTarget);
   const closeMenu = () => setAnchorEl(null);
@@ -217,8 +205,6 @@ export default function Post({ post }) {
             </div>
           )}
         </div>
-
-        {/* FOOTER */}
         <div className="post-footer">
           <div className="actions">
             <div className="action" onClick={toggleLike}>
@@ -232,8 +218,6 @@ export default function Post({ post }) {
             {likes} me gusta · {comments.length} comentarios
           </div>
         </div>
-
-        {/* COMMENTS */}
         {showC && (
           <div className="comments-section">
             {loading && (
@@ -274,7 +258,6 @@ export default function Post({ post }) {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

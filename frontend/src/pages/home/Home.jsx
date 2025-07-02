@@ -8,7 +8,6 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import "./home.scss";
 
 const Home = () => {
-  // Puedes mantener el estado para cambiar entre feed y rewards, si lo deseas.
   const [view, setView] = useState("feed");
 
   return (

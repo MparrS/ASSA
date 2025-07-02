@@ -1,5 +1,3 @@
-// backend/routes/usersRoutes.js
-
 const express = require("express");
 const router  = express.Router();
 const db      = require("../config/db");
@@ -8,7 +6,6 @@ const multer  = require("multer");
 const path    = require("path");
 const fs      = require("fs");
 
-// — Helpers: crea directorio de perfil si no existe —
 const PROFILE_DIR = path.join(
   __dirname, "..", "..",
   "frontend", "public", "assets", "profile"
@@ -17,7 +14,6 @@ if (!fs.existsSync(PROFILE_DIR)) {
   fs.mkdirSync(PROFILE_DIR, { recursive: true });
 }
 
-// — Multer config para subir foto de perfil —
 const storage = multer.diskStorage({
   destination: (_, __, cb) => cb(null, PROFILE_DIR),
   filename:    (_, file, cb) => {
@@ -37,7 +33,6 @@ const upload = multer({
   }
 });
 
-// — POST /api/users — Crear usuario con contrasena = hash(documento) —
 router.post("/", async (req, res, next) => {
   try {
     const {
@@ -77,8 +72,6 @@ router.post("/", async (req, res, next) => {
         hash
       ]
     );
-
-    // Devolver usuario sin contrasena
     const [rows] = await conn.promise().query(
       `SELECT
          id, name, username, documento, email,
@@ -96,7 +89,6 @@ router.post("/", async (req, res, next) => {
     }
 });
 
-// — GET /api/users — Listar todos los usuarios (sin contrasena) —
 router.get("/", async (req, res, next) => {
   try {
     const conn = await db;
@@ -112,7 +104,6 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// — GET /api/users/:id — Obtener un usuario por ID —
 router.get("/:id", async (req, res, next) => {
   try {
     const conn = await db;
@@ -131,7 +122,6 @@ router.get("/:id", async (req, res, next) => {
     next(err);
   }
 });
-// — PUT /api/users/:id — Editar usuario (incluye foto de perfil) —
 router.put("/:id", upload.single("profilePicture"), async (req, res, next) => {
   try {
     const {
@@ -193,7 +183,6 @@ router.put("/:id", upload.single("profilePicture"), async (req, res, next) => {
   }
 });
 
-// — DELETE /api/users/:id — Borrar usuario y dependencias —
 router.delete("/:id", async (req, res, next) => {
   try {
     const conn = await db;
@@ -214,7 +203,6 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
-// — POST /api/users/:id/reset-password — Resetear contrasena al documento —
 router.post("/:id/reset-password", async (req, res, next) => {
   try {
     const conn = await db;
@@ -236,7 +224,6 @@ router.post("/:id/reset-password", async (req, res, next) => {
   }
 });
 
-// — PUT /api/users/:id/password — Cambiar contrasena manualmente —
 router.put("/:id/password", async (req, res, next) => {
   try {
     const { newPassword } = req.body;

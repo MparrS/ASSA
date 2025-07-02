@@ -11,12 +11,10 @@ const MenuLink = ({ Icon, text }) => {
     console.log("Cerrando sesión, espere un momento...");
     localStorage.removeItem("token");
     localStorage.removeItem("rol");
-
-    // Actualizar contexto para reflejar que no hay usuario
     setCurrentUser(null);
 
     console.log("Redirigiendo a /Login...");
-    navigate("/Login"); // Redirigir al login
+    navigate("/Login");
   };
 
   const handleClick = () => {

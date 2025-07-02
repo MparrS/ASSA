@@ -12,8 +12,6 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { currentUser, loading, setCurrentUser } = useContext(AuthContext);
-
-  // Redirigir solo si ya hay usuario cargado y autenticado
   useEffect(() => {
     if (!loading && currentUser) {
       navigate('/');

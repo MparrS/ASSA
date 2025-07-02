@@ -11,28 +11,19 @@ const spacesRoutes   = require("./routes/spacesRoutes");
 
 const app = express();
 app.use(cors());
-
-// 1) JSON + 2) URL‐encoded (para formularios multipart multer hará match sólo sus archivos)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// 3) Sirve estáticos (imágenes y vídeos subidos, incluyendo perfil)
 app.use(
   "/assets",
   express.static(path.join(__dirname, "..", "frontend", "public", "assets"))
 );
-
-// Rutas
 app.use("/api/posts",    postsRoutes);
 app.use("/api/auth",     authRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/users",    usersRoutes);
 app.use("/api/spaces",   spacesRoutes);
-
-// Healthcheck
 app.get("/", (req, res) => res.send("API funcionando"));
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error("❌ ERROR:", err);
   if (err instanceof multer.MulterError) {

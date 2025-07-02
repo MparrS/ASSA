@@ -43,7 +43,6 @@ const Register = () => {
             });
 
             await setDoc(doc(db, res.user.uid), { messages: [] });
-            // console.log(res.user);
           });
         }
       );
@@ -111,13 +110,6 @@ const Register = () => {
                   minLength={6}
                   required
                 />
-                {/* <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  id="confirmPasword"
-                  className="registerInput"
-                  required
-                /> */}
                 <button type="submit" className="registerButton">
                   Sign Up
                 </button>

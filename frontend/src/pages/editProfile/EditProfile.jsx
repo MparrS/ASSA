@@ -51,7 +51,6 @@ const EditProfile = () => {
     fd.append("country", form.country);
     fd.append("direccionLaboral", form.direccionLaboral);
     fd.append("existingProfilePicture", form.existingProfilePicture);
-    // añadir rol y points para no enviar undefined al servidor
     fd.append("rol", currentUser.rol || "");
     fd.append("points", currentUser.points ?? 0);
     if (file) {

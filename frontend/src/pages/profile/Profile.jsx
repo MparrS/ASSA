@@ -14,7 +14,6 @@ const Profile = () => {
         <Sidebar />
         <div className="profileRight">
           <div className="profileRightTop">
-            {/* Se eliminó la imagen grande */}
             <div className="profileInfo">
               <h4 className="profileInfoName">
                 {currentUser.displayName}

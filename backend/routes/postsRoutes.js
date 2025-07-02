@@ -1,5 +1,3 @@
-// backend/routes/postsRoutes.js
-
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
@@ -7,7 +5,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// –– Helpers ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
@@ -16,7 +13,6 @@ const POSTS_DIR = path.join(
 );
 ensureDir(POSTS_DIR);
 
-// –– Multer config ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, POSTS_DIR),
   filename: (req, file, cb) => {
@@ -39,7 +35,6 @@ const upload = multer({
   }
 });
 
-// –– GET /api/posts ─────────────────────────────────────────────────────────
 router.get("/", async (req, res, next) => {
   try {
     const conn = await db;
@@ -109,7 +104,6 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// –– POST /api/posts ────────────────────────────────────────────────────────
 router.post("/", upload.array("media", 10), async (req, res, next) => {
   try {
     const { uid, displayName, content, spaceId } = req.body;
@@ -145,7 +139,6 @@ router.post("/", upload.array("media", 10), async (req, res, next) => {
   }
 });
 
-// –– POST /api/posts/:id/like ───────────────────────────────────────────────
 router.post("/:id/like", async (req, res, next) => {
   const postId = req.params.id;
   const { uid } = req.body;
@@ -171,7 +164,6 @@ router.post("/:id/like", async (req, res, next) => {
   }
 });
 
-// –– POST /api/posts/:id/unlike ─────────────────────────────────────────────
 router.post("/:id/unlike", async (req, res, next) => {
   const postId = req.params.id;
   const { uid } = req.body;
@@ -197,7 +189,6 @@ router.post("/:id/unlike", async (req, res, next) => {
   }
 });
 
-// –– GET /api/posts/:id/isLiked ─────────────────────────────────────────────
 router.get("/:id/isLiked", async (req, res, next) => {
   const postId = req.params.id;
   const { uid } = req.query;
@@ -215,21 +206,16 @@ router.get("/:id/isLiked", async (req, res, next) => {
   }
 });
 
-// –– PUT /api/posts/:id ─────────────────────────────────────────────────────
-// Edita título, cuerpo y agrega nuevos medios (opcional)
 router.put("/:id", upload.array("media", 10), async (req, res, next) => {
   try {
     const postId = req.params.id;
     const { title = "", body = "" } = req.body;
 
     const conn = await db;
-    // actualiza texto
     await conn.promise().execute(
       "UPDATE posts SET title = ?, body = ? WHERE id = ?",
       [title, body, postId]
     );
-
-    // si hay archivos nuevos, insértalos
     if (req.files?.length) {
       const urls = req.files.map(f =>
         `${req.protocol}://${req.get("host")}/assets/posts/${f.filename}`
@@ -240,37 +226,28 @@ router.put("/:id", upload.array("media", 10), async (req, res, next) => {
         [vals]
       );
     }
-
-    // devuelve post actualizado
     res.json({ status: "updated" });
   } catch (err) {
     next(err);
   }
 });
 
-// –– DELETE /api/posts/:id ──────────────────────────────────────────────────
-// Borra post + imágenes + comentarios + likes
 router.delete("/:id", async (req, res, next) => {
   try {
     const postId = req.params.id;
     const conn = await db;
-
-    // elimina imágenes
     await conn.promise().execute(
       "DELETE FROM post_images WHERE postId = ?",
       [postId]
     );
-    // elimina comentarios
     await conn.promise().execute(
       "DELETE FROM comments WHERE postId = ?",
       [postId]
     );
-    // elimina likes
     await conn.promise().execute(
       "DELETE FROM post_likes WHERE postId = ?",
       [postId]
     );
-    // elimina post
     const [result] = await conn.promise().execute(
       "DELETE FROM posts WHERE id = ?",
       [postId]

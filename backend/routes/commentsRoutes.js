@@ -1,9 +1,6 @@
-// routes/commentsRoutes.js
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-
-// Endpoint GET para traer comentarios (ya existente)
 router.get('/', async (req, res) => {
   try {
     const { postId } = req.query;
@@ -23,7 +20,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// NUEVO: Endpoint POST para publicar comentarios
 router.post('/', async (req, res) => {
   try {
     const { postId, userId, body, date, likes } = req.body;
