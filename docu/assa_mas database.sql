@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-06-2025 a las 19:45:30
+-- Tiempo de generación: 03-07-2025 a las 15:42:06
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -87,17 +87,9 @@ CREATE TABLE `spaces` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
-  `userId` int(11) NOT NULL
+  `userId` int(11) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `spaces`
---
-
-INSERT INTO `spaces` (`id`, `name`, `description`, `userId`) VALUES
-(1, 'Bienvenido a Assa Más', 'Bienvenidos a nuestra gran familia', 1),
-(2, 'Gestion Humana', 'Espacio para la gestión humana de la empresa', 1),
-(3, 'Espacio Bienestar para Ti', 'Espacio destinado a ti', 2);
 
 -- --------------------------------------------------------
 
@@ -138,7 +130,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `username`, `documento`, `email`, `fechaIngreso`, `cargo`, `supervisor`, `area`, `country`, `direccionLaboral`, `phone`, `age`, `language`, `celularCorporativo`, `fechaNacimiento`, `estadoCivil`, `direccionPersonal`, `linkedIn`, `estado`, `ultimoLogin`, `profilePicture`, `contrasena`, `points`, `rol`) VALUES
-(1, 'Ioaira Vega', 'ioaveg', 1, 'ioaira.vega@assaabloy.com', '2025-06-25', NULL, NULL, 'RRHH', 'Colombia', 'Cl. 12 #32 39, Bogotá, Colombia', '300585689', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-25 12:35:30', NULL, '1', NULL, 'admin');
+(1, 'Io', 'ioavega', 1, 'ioaira.vega@assaabloy.com', '2025-06-25', NULL, NULL, 'RRHH', 'Colombia', 'Cl. 12 #32 39', '300585689', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-07-02 12:51:54', NULL, '1', 0, 'admin');
 
 --
 -- Índices para tablas volcadas
@@ -203,13 +195,13 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT de la tabla `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT de la tabla `post_images`
 --
 ALTER TABLE `post_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT de la tabla `post_likes`
@@ -227,7 +219,7 @@ ALTER TABLE `spaces`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas
