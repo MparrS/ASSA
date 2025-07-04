@@ -19,48 +19,67 @@ ASSAA/
 │
 ├── backend/
 │   ├── config/
-│   │   └── db.js               // Configuración de la base de datos
+│   │   └── db.js                 // Configuración de la base de datos
 │   ├── controllers/
-│   │   ├── authController.js   // Controlador de autenticación
-│   │   ├── postController.js   // Controlador de publicaciones
-│   │   ├── userController.js   // Controlador de usuarios
-│   │   └── commentController.js // Controlador de comentarios
+│   │   ├── authController.js     // Controlador de autenticación
+│   │   ├── postController.js     // Controlador de publicaciones
+│   │   ├── userController.js     // Controlador de usuarios
+│   │   └── commentController.js  // Controlador de comentarios
 │   ├── middleware/
-│   │   └── authMiddleware.js   // Middleware de autenticación
+│   │   └── authMiddleware.js     // Middleware de autenticación
 │   ├── routes/
-│   │   ├── authRoutes.js      // Rutas de autenticación
-│   │   ├── postRoutes.js      // Rutas de publicaciones
-│   │   ├── userRoutes.js      // Rutas de usuarios
-│   │   └── commentRoutes.js   // Rutas de comentarios
-│   ├── .env                   // Variables de entorno
-│   ├── app.js                 // Archivo principal del servidor
-│   ├── package.json           // Dependencias del backend
-│   └── docu/                  // Documentación adicional
-│       └── assa_mas.sql       // Script de la base de datos
+│   │   ├── authRoutes.js         // Rutas de autenticación
+│   │   ├── postRoutes.js         // Rutas de publicaciones
+│   │   ├── userRoutes.js         // Rutas de usuarios
+│   │   └── commentRoutes.js      // Rutas de comentarios
+│   ├── .env                      // Variables de entorno
+│   ├── app.js                    // Archivo principal del servidor
+│   ├── package.json              // Dependencias del backend
+│   ├── package-lock.json         // Versiones bloqueadas de dependencias
+│   └── docu/
+│       └── assa_mas.sql          // Script de la base de datos
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── assets/            // Recursos estáticos
-│   │   │   ├── images/        // Imágenes del proyecto
-│   │   │   └── icons/         // Iconos de la aplicación
-│   │   ├── components/        // Componentes reutilizables
-│   │   │   ├── navbar/        // Barra de navegación
-│   │   │   ├── sidebar/       // Barra lateral
-│   │   │   ├── post/          // Componente de publicaciones
-│   │   │   └── shared/        // Componentes compartidos
-│   │   ├── context/          // Contextos de React
-│   │   │   ├── AuthContext.js // Contexto de autenticación
-│   │   │   └── ThemeContext.js// Contexto de tema
-│   │   ├── pages/            // Páginas principales
-│   │   │   ├── home/         // Página principal
-│   │   │   ├── profile/      // Perfil de usuario
-│   │   │   └── admin/        // Panel de administración
-│   │   ├── services/         // Servicios y APIs
-│   │   └── styles/           // Estilos globales
-│   ├── public/               // Archivos públicos
-│   └── package.json          // Dependencias del frontend
+│   │   ├── assets/               // Recursos estáticos
+│   │   │   ├── images/           // Imágenes del proyecto
+│   │   │   └── icons/            // Íconos de la aplicación
+│   │   ├── components/           // Componentes reutilizables
+│   │   │   ├── feed/             // Muro de publicaciones
+│   │   │   ├── leftbar/          // Barra lateral izquierda
+│   │   │   ├── profileRightBar/  // Panel derecho en perfil
+│   │   │   ├── rewards/          // Sección de recompensas
+│   │   │   ├── rightbar/         // Barra lateral derecha
+│   │   │   ├── rightbarhome/     // Panel derecho en inicio
+│   │   │   ├── share/            // Compartir contenido
+│   │   │   ├── sidebar/          // Navegación lateral
+│   │   │   └── shared/           // Componentes compartidos
+│   │   ├── context/              // Manejo de estado global con Context API
+│   │   │   ├── AuthContext.js    // Contexto de autenticación
+│   │   │   └── ThemeContext.js   // Contexto de tema visual
+│   │   ├── pages/                // Páginas principales
+│   │   │   ├── AdminPanel/       // Panel de administración
+│   │   │   ├── editProfile/      // Edición de perfil
+│   │   │   ├── home/             // Página principal
+│   │   │   ├── login/            // Inicio de sesión
+│   │   │   ├── profile/          // Perfil del usuario
+│   │   │   └── register/         // Registro de usuarios
+│   │   ├── services/             // Servicios de conexión y lógica externa
+│   │   ├── style/                // Estilos personalizados
+│   │   ├── App.js                // Componente raíz de la app
+│   │   ├── firebase.js           // Configuración de Firebase
+│   │   └── index.js              // Punto de entrada de React
+│   ├── public/                   // Archivos públicos (favicon, index.html)
+│   ├── package.json              // Dependencias del frontend
+│   ├── package-lock.json         // Versiones bloqueadas de dependencias
+│   ├── yarn.lock                 // Versiones de Yarn
 │
-└── README.md                 // Documentación 
+├── README.md                     // Documentación principal del proyecto
+├── readme.md                     // Documentación complementaria
+├── .gitignore                    // Archivos ignorados por Git
+├── .gitattributes                // Atributos de Git configurados
+└── LICENSE                       // Licencia del proyecto
+
 ```
 ---
 
